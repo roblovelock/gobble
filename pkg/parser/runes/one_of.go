@@ -1,3 +1,4 @@
+// Package runes provides parsers for recognizing runes
 package runes
 
 import (
@@ -14,9 +15,6 @@ func OneOf(runes ...rune) parser.Parser[parser.Reader, rune] {
 	return func(in parser.Reader) (rune, error) {
 		r, i, err := in.ReadRune()
 		if err != nil {
-			if err == io.EOF {
-				return 0, io.EOF
-			}
 			_, _ = in.Seek(-int64(i), io.SeekCurrent)
 			return 0, err
 		}

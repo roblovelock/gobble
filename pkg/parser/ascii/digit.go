@@ -1,3 +1,4 @@
+// Package ascii provides parsers for recognizing ascii bytes
 package ascii
 
 import (

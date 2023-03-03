@@ -74,7 +74,7 @@ func headerParser() parser.Parser[parser.Reader, image.Rectangle] {
 		sequence.Preceded(
 			bytes.Tag([]byte("qoif")),
 			sequence.Terminated(
-				sequence.Tuple[parser.Reader, uint32](numeric.BEUint32(), numeric.BEUint32()),
+				sequence.Tuple[parser.Reader, uint32](numeric.UInt32BE(), numeric.UInt32BE()),
 				bytes.Take(2),
 			),
 		),
