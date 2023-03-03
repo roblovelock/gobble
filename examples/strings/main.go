@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
-	"gobble/internal/combinator"
-	"gobble/internal/combinator/branch"
-	"gobble/internal/combinator/multi"
-	"gobble/internal/combinator/sequence"
-	"gobble/internal/parser"
-	"gobble/internal/parser/bytes"
-	"gobble/internal/parser/character"
-	"gobble/internal/predicate"
+	"gobble/pkg/combinator"
+	"gobble/pkg/combinator/branch"
+	"gobble/pkg/combinator/multi"
+	"gobble/pkg/combinator/sequence"
+	"gobble/pkg/parser"
+	"gobble/pkg/parser/ascii"
+	"gobble/pkg/parser/bytes"
+	"gobble/pkg/parser/runes"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 func main() {
@@ -54,7 +55,7 @@ func parseUnicode() parser.Parser[parser.Reader, rune] {
 			bytes.Byte('u'),
 			sequence.Delimited(
 				bytes.Byte('{'),
-				character.TakeWhileMN(1, 6, predicate.IsHexDigit[rune]),
+				runes.TakeWhileMinMax(1, 6, func(r rune) bool { return unicode.Is(unicode.ASCII_Hex_Digit, r) }),
 				bytes.Byte('}'),
 			),
 		),
@@ -67,13 +68,24 @@ func parseUnicode() parser.Parser[parser.Reader, rune] {
 
 func parseEscapedWhitespace() parser.Parser[parser.Reader, string] {
 	return sequence.Preceded(
-		sequence.Preceded(bytes.Byte('\\'), character.Space1()),
+		sequence.Preceded(bytes.Byte('\\'), ascii.Whitespace1()),
 		combinator.Success[parser.Reader](""),
 	)
 }
 
 func parseLiteral() parser.Parser[parser.Reader, string] {
-	return combinator.Verify(character.IsNot('"', '\\'), func(v string) bool { return len(v) > 0 })
+	return combinator.Verify(runes.TakeWhile(isNot('"', '\\')), func(v string) bool { return len(v) > 0 })
+}
+
+func isNot(runes ...rune) parser.Predicate[rune] {
+	return func(r1 rune) bool {
+		for _, r2 := range runes {
+			if r1 == r2 {
+				return false
+			}
+		}
+		return true
+	}
 }
 
 func parseFragment() parser.Parser[parser.Reader, string] {

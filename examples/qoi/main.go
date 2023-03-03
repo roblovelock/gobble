@@ -3,14 +3,14 @@ package main
 import (
 	bytes2 "bytes"
 	"fmt"
-	"gobble/internal/combinator"
-	"gobble/internal/combinator/branch"
-	"gobble/internal/combinator/multi"
-	"gobble/internal/combinator/sequence"
-	"gobble/internal/parser"
-	"gobble/internal/parser/bits"
-	"gobble/internal/parser/bytes"
-	"gobble/internal/parser/numeric"
+	"gobble/pkg/combinator"
+	"gobble/pkg/combinator/branch"
+	"gobble/pkg/combinator/multi"
+	"gobble/pkg/combinator/sequence"
+	"gobble/pkg/parser"
+	"gobble/pkg/parser/bits"
+	"gobble/pkg/parser/bytes"
+	"gobble/pkg/parser/numeric"
 	"image"
 	"image/color"
 	"image/png"
@@ -74,8 +74,8 @@ func headerParser() parser.Parser[parser.Reader, image.Rectangle] {
 		sequence.Preceded(
 			bytes.Tag([]byte("qoif")),
 			sequence.Terminated(
-				sequence.Tuple[parser.Reader, uint32](numeric.BEUint32[parser.Reader](), numeric.BEUint32[parser.Reader]()),
-				bytes.Take[parser.Reader](2),
+				sequence.Tuple[parser.Reader, uint32](numeric.BEUint32(), numeric.BEUint32()),
+				bytes.Take(2),
 			),
 		),
 		func(i []uint32) (image.Rectangle, error) {
@@ -95,7 +95,7 @@ func rgbParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 	return sequence.Preceded(
 		bytes.Byte(0xFE),
 		combinator.Map(
-			bytes.Take[parser.Reader](3),
+			bytes.Take(3),
 			func(b []byte) ([]color.Color, error) {
 				ctx.setColor(color.NRGBA{R: b[0], G: b[1], B: b[2], A: ctx.c.A})
 				return []color.Color{ctx.c}, nil
@@ -108,7 +108,7 @@ func rgbaParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 	return sequence.Preceded(
 		bytes.Byte(0xFF),
 		combinator.Map(
-			bytes.Take[parser.Reader](4),
+			bytes.Take(4),
 			func(b []byte) ([]color.Color, error) {
 				ctx.setColor(color.NRGBA{R: b[0], G: b[1], B: b[2], A: b[3]})
 				return []color.Color{ctx.c}, nil
