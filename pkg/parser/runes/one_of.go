@@ -1,4 +1,3 @@
-// Package runes provides parsers for recognizing runes
 package runes
 
 import (
