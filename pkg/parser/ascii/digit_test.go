@@ -2,10 +2,10 @@ package ascii_test
 
 import (
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gobble/pkg/parser"
-	"gobble/pkg/parser/ascii"
 	"io"
 	"strings"
 	"testing"

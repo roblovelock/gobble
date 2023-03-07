@@ -2,9 +2,9 @@ package bytes_test
 
 import (
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"github.com/stretchr/testify/assert"
-	"gobble/pkg/parser"
-	"gobble/pkg/parser/bytes"
 	"io"
 	"strings"
 	"testing"

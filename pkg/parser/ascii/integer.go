@@ -2,11 +2,11 @@ package ascii
 
 import (
 	"errors"
-	"gobble/pkg/combinator"
-	"gobble/pkg/combinator/branch"
-	"gobble/pkg/combinator/sequence"
-	"gobble/pkg/parser"
-	"gobble/pkg/parser/bytes"
+	"github.com/roblovelock/gobble/pkg/combinator"
+	"github.com/roblovelock/gobble/pkg/combinator/branch"
+	"github.com/roblovelock/gobble/pkg/combinator/sequence"
+	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser/bytes"
 )
 
 var (
@@ -14,24 +14,36 @@ var (
 	ErrOverflow = errors.New("overflow") // the parsed digits don't fit in the value type
 )
 
+type (
+	signedIntConstraint interface {
+		int8 | int16 | int32 | int64
+	}
+	unsignedIntConstraint interface {
+		uint8 | uint16 | uint32 | uint64
+	}
+	intConstraint interface {
+		signedIntConstraint | unsignedIntConstraint
+	}
+)
+
 // UInt8 will parse a number in text form to uint8
 func UInt8() parser.Parser[parser.Reader, uint8] {
-	return positiveIntParser[uint8]()
+	return unsignedIntParser[uint8]()
 }
 
 // UInt16 will parse a number in text form to uint16
 func UInt16() parser.Parser[parser.Reader, uint16] {
-	return positiveIntParser[uint16]()
+	return unsignedIntParser[uint16]()
 }
 
 // UInt32 will parse a number in text form to uint32
 func UInt32() parser.Parser[parser.Reader, uint32] {
-	return positiveIntParser[uint32]()
+	return unsignedIntParser[uint32]()
 }
 
 // UInt64 will parse a number in text form to uint64
 func UInt64() parser.Parser[parser.Reader, uint64] {
-	return positiveIntParser[uint64]()
+	return unsignedIntParser[uint64]()
 }
 
 // Int8 will parse a number in text form to uint8
@@ -54,18 +66,18 @@ func Int64() parser.Parser[parser.Reader, int64] {
 	return signedIntParser[int64]()
 }
 
-func signedIntParser[T int8 | int16 | int32 | int64]() parser.Parser[parser.Reader, T] {
+func signedIntParser[T signedIntConstraint]() parser.Parser[parser.Reader, T] {
 	return branch.Alt(
 		sequence.Preceded(bytes.Byte('-'), intParser(checkedSub[T])),
-		positiveIntParser[T](),
+		unsignedIntParser[T](),
 	)
 }
 
-func positiveIntParser[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64]() parser.Parser[parser.Reader, T] {
+func unsignedIntParser[T intConstraint]() parser.Parser[parser.Reader, T] {
 	return sequence.Preceded(combinator.Optional(bytes.Byte('+')), intParser(checkedAdd[T]))
 }
 
-func intParser[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64](
+func intParser[T intConstraint](
 	f func(a T, b uint8) (T, error),
 ) parser.Parser[parser.Reader, T] {
 	return combinator.Map(Digit1(), func(digits []byte) (result T, err error) {
@@ -85,7 +97,7 @@ func intParser[T uint8 | uint16 | uint32 | uint64 | int8 | int16 | int32 | int64
 	})
 }
 
-func checkedMul[T int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64](a T, b T) (T, error) {
+func checkedMul[T intConstraint](a T, b T) (T, error) {
 	if a == 0 || b == 0 {
 		return 0, nil
 	}
@@ -98,7 +110,7 @@ func checkedMul[T int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint6
 	return 0, ErrOverflow
 }
 
-func checkedAdd[T int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64](a T, b uint8) (T, error) {
+func checkedAdd[T intConstraint](a T, b uint8) (T, error) {
 	result := a + T(b)
 	if (result > a) == (b > 0) {
 		return result, nil
@@ -107,7 +119,7 @@ func checkedAdd[T int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint6
 	return 0, ErrOverflow
 }
 
-func checkedSub[T int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64](a T, b uint8) (T, error) {
+func checkedSub[T intConstraint](a T, b uint8) (T, error) {
 	result := a - T(b)
 	if (result < a) == (b > 0) {
 		return result, nil

@@ -1,11 +1,11 @@
 package branch
 
 import (
+	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser/bytes"
+	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gobble/pkg/parser"
-	"gobble/pkg/parser/bytes"
-	"gobble/pkg/parser/runes"
 	"io"
 	"strings"
 	"testing"

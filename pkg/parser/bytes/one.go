@@ -2,7 +2,7 @@
 package bytes
 
 import (
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 )
 
 // One reads a single byte

@@ -3,10 +3,10 @@ package runes_test
 import (
 	"bytes"
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gobble/pkg/parser"
-	"gobble/pkg/parser/runes"
 	"io"
 	"strings"
 	"testing"
@@ -44,7 +44,7 @@ func TestOne(t *testing.T) {
 		name       string
 		args       args
 		wantMatch  rune
-		wantRemain []byte
+		wantRemain string
 		wantErr    error
 	}{
 		{
@@ -56,7 +56,7 @@ func TestOne(t *testing.T) {
 			name:       "rune => match",
 			args:       args{input: strings.NewReader("𒀀𒀀")},
 			wantMatch:  '𒀀',
-			wantRemain: []byte("𒀀"),
+			wantRemain: "𒀀",
 		},
 	}
 	for _, tt := range tests {

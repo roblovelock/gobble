@@ -1,7 +1,7 @@
 package combinator
 
 import (
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 )
 
 func Value[R parser.Reader, T, V any](p parser.Parser[R, T], val V) parser.Parser[R, V] {

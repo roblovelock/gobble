@@ -1,7 +1,7 @@
 package multi
 
 import (
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 )
 
 func Many0[R parser.Reader, T any](p parser.Parser[R, T]) parser.Parser[R, []T] {

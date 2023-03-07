@@ -3,9 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gobble/pkg/parser"
 	"image"
 	"image/png"
 	"os"

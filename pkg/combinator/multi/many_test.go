@@ -1,10 +1,10 @@
 package multi
 
 import (
+	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gobble/pkg/parser"
-	"gobble/pkg/parser/runes"
 	"io"
 	"strings"
 	"testing"

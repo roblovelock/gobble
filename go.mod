@@ -1,4 +1,4 @@
-module gobble
+module github.com/roblovelock/gobble
 
 go 1.19
 

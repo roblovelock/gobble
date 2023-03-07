@@ -2,7 +2,7 @@
 package ascii
 
 import (
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
 

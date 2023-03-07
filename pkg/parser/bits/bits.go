@@ -2,7 +2,7 @@ package bits
 
 import (
 	"errors"
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
 

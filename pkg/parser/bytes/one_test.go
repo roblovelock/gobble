@@ -3,10 +3,10 @@ package bytes_test
 import (
 	"bytes"
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/parser"
+	gobble "github.com/roblovelock/gobble/pkg/parser/bytes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gobble/pkg/parser"
-	gobble "gobble/pkg/parser/bytes"
 	"io"
 	"testing"
 )

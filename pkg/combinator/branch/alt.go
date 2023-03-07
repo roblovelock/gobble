@@ -2,7 +2,7 @@ package branch
 
 import (
 	"errors"
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 )
 
 func Alt[R parser.Reader, T any](parsers ...parser.Parser[R, T]) parser.Parser[R, T] {

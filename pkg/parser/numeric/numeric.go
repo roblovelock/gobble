@@ -3,9 +3,9 @@ package numeric
 
 import (
 	"encoding/binary"
-	"gobble/pkg/combinator"
-	"gobble/pkg/parser"
-	"gobble/pkg/parser/bytes"
+	"github.com/roblovelock/gobble/pkg/combinator"
+	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser/bytes"
 )
 
 // UInt8 returns a 1 byte unsigned integer. io.EOF is returned if the input contains too few bytes

@@ -1,7 +1,7 @@
 package combinator
 
 import (
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 )
 
 func Verify[R parser.Reader, T any](p parser.Parser[R, T], predicate parser.Predicate[T]) parser.Parser[R, T] {

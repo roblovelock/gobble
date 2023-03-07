@@ -2,7 +2,7 @@ package bytes
 
 import (
 	"bytes"
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
 

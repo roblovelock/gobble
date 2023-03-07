@@ -1,7 +1,7 @@
 package combinator
 
 import (
-	"gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/parser"
 )
 
 type MapFunc[T, V any] func(T) (V, error)

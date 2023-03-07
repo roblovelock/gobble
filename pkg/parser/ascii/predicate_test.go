@@ -1,8 +1,8 @@
 package ascii_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
-	"gobble/pkg/parser/ascii"
 	"math"
 	"testing"
 )
