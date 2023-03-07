@@ -1,9 +1,9 @@
 # gobble
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-gobble is a parser combinator library written in Go. Its aim is to allow users to
-build complex parsers, without compromising on speed, while abstracting away most of 
-the parsing complexities.
+gobble is a parser combinator library written in Go. It was inspired by the [nom](https://github.com/rust-bakery/nom)
+library written for Rust. Its aim is to allow users to build complex parsers, without compromising on speed, while 
+abstracting away most of the parsing complexities.
 
 # Example
 
