@@ -3,7 +3,7 @@ package numeric
 
 import (
 	"encoding/binary"
-	"github.com/roblovelock/gobble/pkg/combinator"
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 )
@@ -88,7 +88,7 @@ func cast[U uint16 | uint32 | uint64, S int16 | int32 | int64](f func(b []byte) 
 }
 
 func endian[T uint16 | uint32 | uint64 | int16 | int32 | int64](l uint, f func([]byte) T) parser.Parser[parser.Reader, T] {
-	return combinator.Map[parser.Reader, []byte, T](
+	return modifier.Map[parser.Reader, []byte, T](
 		bytes.Take(l),
 		func(bytes []byte) (T, error) {
 			return f(bytes), nil

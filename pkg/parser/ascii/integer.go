@@ -2,8 +2,8 @@ package ascii
 
 import (
 	"errors"
-	"github.com/roblovelock/gobble/pkg/combinator"
 	"github.com/roblovelock/gobble/pkg/combinator/branch"
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/combinator/sequence"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
@@ -74,13 +74,13 @@ func signedIntParser[T signedIntConstraint]() parser.Parser[parser.Reader, T] {
 }
 
 func unsignedIntParser[T intConstraint]() parser.Parser[parser.Reader, T] {
-	return sequence.Preceded(combinator.Optional(bytes.Byte('+')), intParser(checkedAdd[T]))
+	return sequence.Preceded(modifier.Optional(bytes.Byte('+')), intParser(checkedAdd[T]))
 }
 
 func intParser[T intConstraint](
 	f func(a T, b uint8) (T, error),
 ) parser.Parser[parser.Reader, T] {
-	return combinator.Map(Digit1(), func(digits []byte) (result T, err error) {
+	return modifier.Map(Digit1(), func(digits []byte) (result T, err error) {
 		for _, d := range digits {
 			result, err = checkedMul(result, 10)
 			if err != nil {

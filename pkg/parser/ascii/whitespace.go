@@ -4,19 +4,7 @@ import (
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"io"
-	"math"
 )
-
-var whitespace = [math.MaxUint8]bool{}
-
-func init() {
-	whitespace[' '] = true
-	whitespace['\r'] = true
-	whitespace['\n'] = true
-	whitespace['\t'] = true
-	whitespace['\v'] = true
-	whitespace['\f'] = true
-}
 
 func Whitespace() parser.Parser[parser.Reader, byte] {
 	return func(in parser.Reader) (byte, error) {
@@ -25,7 +13,7 @@ func Whitespace() parser.Parser[parser.Reader, byte] {
 			return 0, err
 		}
 
-		if !whitespace[b] {
+		if !IsWhitespace(b) {
 			_, _ = in.Seek(-1, io.SeekCurrent)
 			return 0, parser.ErrNotMatched
 		}
@@ -35,21 +23,21 @@ func Whitespace() parser.Parser[parser.Reader, byte] {
 }
 
 func Whitespace0() parser.Parser[parser.Reader, []byte] {
-	return bytes.OneOf0(' ', '\r', '\n', '\t')
+	return bytes.TakeWhile(IsWhitespace)
 }
 
 func Whitespace1() parser.Parser[parser.Reader, []byte] {
-	return bytes.OneOf1(' ', '\r', '\n', '\t')
+	return bytes.TakeWhile1(IsWhitespace)
 }
 
 func SkipWhitespace() parser.Parser[parser.Reader, parser.Empty] {
-	return bytes.Skip(func(b byte) bool { return whitespace[b] })
+	return bytes.Skip(IsWhitespace)
 }
 
 func SkipWhitespace0() parser.Parser[parser.Reader, parser.Empty] {
-	return bytes.Skip0(func(b byte) bool { return whitespace[b] })
+	return bytes.Skip0(IsWhitespace)
 }
 
 func SkipWhitespace1() parser.Parser[parser.Reader, parser.Empty] {
-	return bytes.Skip1(func(b byte) bool { return whitespace[b] })
+	return bytes.Skip1(IsWhitespace)
 }

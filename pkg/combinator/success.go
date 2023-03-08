@@ -2,8 +2,9 @@ package combinator
 
 import "github.com/roblovelock/gobble/pkg/parser"
 
-func Success[R parser.Reader, T any](val T) parser.Parser[R, T] {
+// Success always succeeds. It returns the provided value without consuming any input.
+func Success[R parser.Reader, T any](value T) parser.Parser[R, T] {
 	return func(in R) (T, error) {
-		return val, nil
+		return value, nil
 	}
 }

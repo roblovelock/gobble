@@ -13,8 +13,8 @@
 package main
 
 import (
-	"github.com/roblovelock/gobble/pkg/combinator"
 	"github.com/roblovelock/gobble/pkg/combinator/branch"
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/combinator/multi"
 	"github.com/roblovelock/gobble/pkg/combinator/sequence"
 	"github.com/roblovelock/gobble/pkg/parser"
@@ -57,7 +57,7 @@ func init() {
 	)
 
 	// (mulop value)*
-	mulOpValue := multi.Many0(combinator.Map(
+	mulOpValue := multi.Many0(modifier.Map(
 		sequence.Pair(mulOp, value),
 		func(p parser.Pair[byte, int64]) (func(int64) int64, error) {
 			if p.First == '*' {
@@ -71,10 +71,10 @@ func init() {
 		},
 	))
 
-	prod := combinator.Map(sequence.Pair(value, mulOpValue), foldOp)
+	prod := modifier.Map(sequence.Pair(value, mulOpValue), foldOp)
 
 	// (addop value)*
-	addOpValue := multi.Many0(combinator.Map(
+	addOpValue := multi.Many0(modifier.Map(
 		sequence.Pair(addOp, prod),
 		func(p parser.Pair[byte, int64]) (func(int64) int64, error) {
 			if p.First == '+' {
@@ -88,7 +88,7 @@ func init() {
 		},
 	))
 
-	sum = combinator.Map(sequence.Pair(prod, addOpValue), foldOp)
+	sum = modifier.Map(sequence.Pair(prod, addOpValue), foldOp)
 }
 
 func ParseExpr(expr string) (int64, error) {

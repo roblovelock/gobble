@@ -261,3 +261,73 @@ func TestIsOctDigit(t *testing.T) {
 		})
 	}
 }
+
+func TestIsLowercaseLetter(t *testing.T) {
+	type args struct {
+		start byte
+		end   byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "lowercase letter characters match",
+			args: args{start: 'a', end: 'z'},
+			want: true,
+		},
+		{
+			name: "non lowercase letter characters < a don't match",
+			args: args{start: 0, end: 'a' - 1},
+			want: false,
+		},
+		{
+			name: "non lowercase letter characters > z don't match",
+			args: args{start: 'z' + 1, end: math.MaxUint8},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for i := tt.args.start; i < tt.args.end; i++ {
+				assert.Equalf(t, tt.want, ascii.IsLowercaseLetter(i), "IsLowercaseLetter(%v)", i)
+			}
+		})
+	}
+}
+
+func TestIsUppercaseLetter(t *testing.T) {
+	type args struct {
+		start byte
+		end   byte
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "uppercase letter characters match",
+			args: args{start: 'A', end: 'Z'},
+			want: true,
+		},
+		{
+			name: "non uppercase letter characters < A don't match",
+			args: args{start: 0, end: 'A' - 1},
+			want: false,
+		},
+		{
+			name: "non uppercase letter characters > Z don't match",
+			args: args{start: 'Z' + 1, end: math.MaxUint8},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for i := tt.args.start; i < tt.args.end; i++ {
+				assert.Equalf(t, tt.want, ascii.IsUppercaseLetter(i), "IsUppercaseLetter(%v)", i)
+			}
+		})
+	}
+}

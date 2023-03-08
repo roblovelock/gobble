@@ -24,6 +24,8 @@ func Pair[R parser.Reader, F, S any](first parser.Parser[R, F], second parser.Pa
 	}
 }
 
+// SeparatedPair Gets an object from the first parser, then checks the separator parser, before getting another object
+// from the final parser.
 func SeparatedPair[R parser.Reader, F, S, T any](
 	first parser.Parser[R, F], separator parser.Parser[R, T], second parser.Parser[R, S],
 ) parser.Parser[R, parser.Pair[F, S]] {

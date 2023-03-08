@@ -22,14 +22,9 @@ type (
 		ReadBool() (bool, error)
 	}
 
-	ParserFunc[R Reader, T any]       func(in R) (T, error)
-	ParserFuncPtr[R Reader, T any]    *func(in R) (T, error)
-	ParserConstraint[R Reader, T any] interface {
-		ParserFunc[R, T] | ParserFuncPtr[R, T]
-	}
-	Parser[R Reader, T any] ParserFunc[R, T]
+	Parser[R Reader, T any] func(in R) (T, error)
 
-	Empty                 struct{}
+	Empty                 *struct{}
 	Predicate[T any]      func(T) bool
 	Accumulator[T, R any] func(R, T) R
 	Pair[A, B any]        struct {
@@ -37,12 +32,6 @@ type (
 		Second B
 	}
 )
-
-func Untyped[R Reader, T any](p Parser[R, T]) Parser[R, interface{}] {
-	return func(in R) (interface{}, error) {
-		return p(in)
-	}
-}
 
 func Ptr[R Reader, T any](p *Parser[R, T]) Parser[R, T] {
 	return func(in R) (T, error) {

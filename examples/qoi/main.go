@@ -3,14 +3,15 @@ package main
 import (
 	bytes2 "bytes"
 	"fmt"
-	"github.com/roblovelock/gobble/pkg/combinator"
 	"github.com/roblovelock/gobble/pkg/combinator/branch"
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/combinator/multi"
 	"github.com/roblovelock/gobble/pkg/combinator/sequence"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bits"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"github.com/roblovelock/gobble/pkg/parser/numeric"
+	"github.com/roblovelock/gobble/pkg/parser/stream"
 	"image"
 	"image/color"
 	"image/png"
@@ -54,7 +55,7 @@ func main() {
 }
 
 func parseImage(in parser.Reader) (image.Image, error) {
-	return combinator.Map(
+	return modifier.Map(
 		sequence.Pair(
 			headerParser(),
 			pixelParser(),
@@ -70,7 +71,7 @@ func parseImage(in parser.Reader) (image.Image, error) {
 }
 
 func headerParser() parser.Parser[parser.Reader, image.Rectangle] {
-	return combinator.Map(
+	return modifier.Map(
 		sequence.Preceded(
 			bytes.Tag([]byte("qoif")),
 			sequence.Terminated(
@@ -87,14 +88,14 @@ func headerParser() parser.Parser[parser.Reader, image.Rectangle] {
 func endParser() parser.Parser[parser.Reader, parser.Empty] {
 	return sequence.Preceded(
 		bytes.Tag([]byte{0, 0, 0, 0, 0, 0, 0, 1}),
-		combinator.EOF(),
+		stream.EOF(),
 	)
 }
 
 func rgbParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 	return sequence.Preceded(
 		bytes.Byte(0xFE),
-		combinator.Map(
+		modifier.Map(
 			bytes.Take(3),
 			func(b []byte) ([]color.Color, error) {
 				ctx.setColor(color.NRGBA{R: b[0], G: b[1], B: b[2], A: ctx.c.A})
@@ -107,7 +108,7 @@ func rgbParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 func rgbaParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 	return sequence.Preceded(
 		bytes.Byte(0xFF),
-		combinator.Map(
+		modifier.Map(
 			bytes.Take(4),
 			func(b []byte) ([]color.Color, error) {
 				ctx.setColor(color.NRGBA{R: b[0], G: b[1], B: b[2], A: b[3]})
@@ -121,7 +122,7 @@ func indexParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] 
 	return bits.Bits(
 		sequence.Preceded(
 			bits.Tag[uint8](2, 0x00),
-			combinator.Map[parser.BitReader, uint8, []color.Color](
+			modifier.Map[parser.BitReader, uint8, []color.Color](
 				bits.Take[uint8](6),
 				func(i uint8) ([]color.Color, error) {
 					ctx.setColor(ctx.p[i])
@@ -136,7 +137,7 @@ func diffParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 	return bits.Bits(
 		sequence.Preceded(
 			bits.Tag[uint8](2, 0x01),
-			combinator.Map(
+			modifier.Map(
 				sequence.Tuple[parser.BitReader, uint8](
 					bits.Take[uint8](2), bits.Take[uint8](2), bits.Take[uint8](2),
 				),
@@ -155,7 +156,7 @@ func lumaParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 	return bits.Bits(
 		sequence.Preceded(
 			bits.Tag[uint8](2, 0x02),
-			combinator.Map(
+			modifier.Map(
 				sequence.Tuple[parser.BitReader, uint8](
 					bits.Take[uint8](6), bits.Take[uint8](4), bits.Take[uint8](4),
 				),
@@ -176,7 +177,7 @@ func runParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 	return bits.Bits(
 		sequence.Preceded(
 			bits.Tag[uint8](2, 0x03),
-			combinator.Map(
+			modifier.Map(
 				bits.Take[uint8](6),
 				func(count uint8) ([]color.Color, error) {
 					c := make([]color.Color, count+1)
@@ -197,7 +198,7 @@ func pixelParser() parser.Parser[parser.Reader, []color.Color] {
 
 	return multi.FoldMany0(
 		branch.Alt(
-			combinator.Value(endParser(), []color.Color{}),
+			modifier.Value(endParser(), []color.Color{}),
 			rgbParser(&ctx),
 			rgbaParser(&ctx),
 			indexParser(&ctx),

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/roblovelock/gobble/pkg/combinator"
 	"github.com/roblovelock/gobble/pkg/combinator/branch"
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/combinator/multi"
 	"github.com/roblovelock/gobble/pkg/combinator/sequence"
 	"github.com/roblovelock/gobble/pkg/parser"
@@ -25,16 +25,16 @@ var (
 	colon      = bytes.Byte(':')
 
 	stringVal  = runes.EscapedString()
-	numericVal = combinator.Map(
+	numericVal = modifier.Map(
 		bytes.TakeWhile(func(b byte) bool { return numericCheck[b] }),
 		func(b []byte) (interface{}, error) {
 			return strconv.ParseFloat(string(b), 64)
 		},
 	)
 
-	nullVal  = combinator.Value[parser.Reader, []byte, interface{}](bytes.Tag([]byte("null")), nil)
-	trueVal  = combinator.Value(bytes.Tag([]byte("true")), true)
-	falseVal = combinator.Value(bytes.Tag([]byte("false")), false)
+	nullVal  = modifier.Value[parser.Reader, []byte, interface{}](bytes.Tag([]byte("null")), nil)
+	trueVal  = modifier.Value(bytes.Tag([]byte("true")), true)
+	falseVal = modifier.Value(bytes.Tag([]byte("false")), false)
 
 	fieldName = sequence.Terminated(stringVal, ws)
 
@@ -74,7 +74,7 @@ func init() {
 
 	field := sequence.SeparatedPair(fieldName, colon, val)
 
-	objVal = combinator.Map(sequence.Delimited(
+	objVal = modifier.Map(sequence.Delimited(
 		sequence.Terminated(openBrace, ws),
 		multi.Separated0(field, sequence.Delimited(ws, comma, ws)),
 		sequence.Preceded(ws, closeBrace),

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/roblovelock/gobble/pkg/combinator"
 	"github.com/roblovelock/gobble/pkg/combinator/branch"
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/combinator/multi"
 	"github.com/roblovelock/gobble/pkg/combinator/sequence"
 	"github.com/roblovelock/gobble/pkg/parser"
@@ -30,19 +31,19 @@ func main() {
 }
 
 func parseEscapedChar() parser.Parser[parser.Reader, string] {
-	return combinator.Map(
+	return modifier.Map(
 		sequence.Preceded(
 			bytes.Byte('\\'),
 			branch.Alt(
 				parseUnicode(),
-				combinator.Value(bytes.Byte('n'), '\n'),
-				combinator.Value(bytes.Byte('r'), '\r'),
-				combinator.Value(bytes.Byte('t'), '\t'),
-				combinator.Value(bytes.Byte('b'), '\b'),
-				combinator.Value(bytes.Byte('f'), '\f'),
-				combinator.Value(bytes.Byte('\\'), '\\'),
-				combinator.Value(bytes.Byte('/'), '/'),
-				combinator.Value(bytes.Byte('"'), '"'),
+				modifier.Value(bytes.Byte('n'), '\n'),
+				modifier.Value(bytes.Byte('r'), '\r'),
+				modifier.Value(bytes.Byte('t'), '\t'),
+				modifier.Value(bytes.Byte('b'), '\b'),
+				modifier.Value(bytes.Byte('f'), '\f'),
+				modifier.Value(bytes.Byte('\\'), '\\'),
+				modifier.Value(bytes.Byte('/'), '/'),
+				modifier.Value(bytes.Byte('"'), '"'),
 			),
 		),
 		func(r rune) (string, error) { return string(r), nil },
@@ -50,7 +51,7 @@ func parseEscapedChar() parser.Parser[parser.Reader, string] {
 }
 
 func parseUnicode() parser.Parser[parser.Reader, rune] {
-	return combinator.Map(
+	return modifier.Map(
 		sequence.Preceded(
 			bytes.Byte('u'),
 			sequence.Delimited(
@@ -74,7 +75,7 @@ func parseEscapedWhitespace() parser.Parser[parser.Reader, string] {
 }
 
 func parseLiteral() parser.Parser[parser.Reader, string] {
-	return combinator.Verify(runes.TakeWhile(isNot('"', '\\')), func(v string) bool { return len(v) > 0 })
+	return modifier.Verify(runes.TakeWhile(isNot('"', '\\')), func(v string) bool { return len(v) > 0 })
 }
 
 func isNot(runes ...rune) parser.Predicate[rune] {
@@ -97,7 +98,7 @@ func parseFragment() parser.Parser[parser.Reader, string] {
 }
 
 func parseString(in parser.Reader) (string, error) {
-	return combinator.Map(sequence.Delimited(
+	return modifier.Map(sequence.Delimited(
 		bytes.Byte('"'),
 		multi.FoldMany0(
 			parseFragment(),

@@ -1,8 +1,8 @@
 package ascii
 
 import (
-	"github.com/roblovelock/gobble/pkg/combinator"
 	"github.com/roblovelock/gobble/pkg/combinator/branch"
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/combinator/sequence"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
@@ -33,19 +33,21 @@ func Float64() parser.Parser[parser.Reader, float64] {
 func floatParser[T floatConstraint](
 	f func(b []byte) (T, error),
 ) parser.Parser[parser.Reader, T] {
-	var sign = bytes.TakeWhileMinMax(0, 1, func(b byte) bool { return b == '+' || b == '-' })
-	var point = bytes.TakeWhileMinMax(0, 1, func(b byte) bool { return b == '.' })
-	var e = bytes.TakeWhileMinMax(0, 1, func(b byte) bool { return b == 'e' || b == 'E' })
-	var fp = branch.Alt(
-		sequence.AccumulateBytes(
-			Digit1(),
-			combinator.Optional(
-				sequence.AccumulateBytes(point, combinator.Optional(Digit1())),
-			),
-		),
-		sequence.AccumulateBytes(point, Digit1()),
-	)
-	var exp = combinator.Optional(sequence.AccumulateBytes(e, combinator.Optional(sign), Digit1()))
+	var sign = bytes.OneOf('+', '-')
+	var point = bytes.Byte('.')
 
-	return combinator.Map(sequence.AccumulateBytes(sign, fp, exp), f)
+	var float = sequence.Recognize(sequence.Delimited(
+		modifier.Optional(sign),
+		branch.Alt(
+			sequence.Terminated(Digit1(), modifier.Optional(sequence.Preceded(point, Digit1()))),
+			sequence.Preceded(point, Digit1()),
+		),
+		modifier.Optional(sequence.Delimited(
+			bytes.OneOf('e', 'E'),
+			modifier.Optional(sign),
+			Digit1(),
+		)),
+	))
+
+	return modifier.Map(float, f)
 }
