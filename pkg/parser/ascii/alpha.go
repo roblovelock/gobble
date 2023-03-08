@@ -6,18 +6,18 @@ import (
 	"io"
 )
 
-// Digit matches a single ASCII numerical character: 0-9
-//   - If the input matches a numerical character, it will return the match.
+// Alpha matches a single ASCII letter character: [a-zA-Z]
+//   - If the input matches a letter character, it will return the match.
 //   - If the input is empty, it will return io.EOF
-//   - If the input doesn't match a numerical character, it will return parser.ErrNotMatched
-func Digit() parser.Parser[parser.Reader, byte] {
+//   - If the input doesn't match a letter character, it will return parser.ErrNotMatched
+func Alpha() parser.Parser[parser.Reader, byte] {
 	return func(in parser.Reader) (byte, error) {
 		b, err := in.ReadByte()
 		if err != nil {
 			return 0, err
 		}
 
-		if IsDigit(b) {
+		if IsLetter(b) {
 			return b, nil
 		}
 
@@ -26,11 +26,11 @@ func Digit() parser.Parser[parser.Reader, byte] {
 	}
 }
 
-// Digit0 matches zero or more ASCII numerical characters: 0-9
-//   - If the input matches a numerical character, it will return a slice of all matched digits.
+// Alpha0 matches zero or more ASCII letter characters: [a-zA-Z]
+//   - If the input matches a letter character, it will return a slice of all matched letters.
 //   - If the input is empty, it will return an empty slice.
-//   - If the input doesn't match a numerical character, it will return an empty slice.
-func Digit0() parser.Parser[parser.Reader, []byte] {
+//   - If the input doesn't match a letter character, it will return an empty slice.
+func Alpha0() parser.Parser[parser.Reader, []byte] {
 	return func(in parser.Reader) ([]byte, error) {
 		digits := make([]byte, 0)
 
@@ -38,7 +38,9 @@ func Digit0() parser.Parser[parser.Reader, []byte] {
 			b, err := in.ReadByte()
 			if err != nil {
 				return digits, nil
-			} else if !IsDigit(b) {
+			}
+
+			if !IsLetter(b) {
 				_, _ = in.Seek(-1, io.SeekCurrent)
 				return digits, nil
 			}
@@ -47,18 +49,18 @@ func Digit0() parser.Parser[parser.Reader, []byte] {
 	}
 }
 
-// Digit1 matches one or more ASCII numerical characters: 0-9
-//   - If the input matches a numerical character, it will return a slice of all matched digits.
+// Alpha1 matches one or more ASCII letter characters: [a-zA-Z]
+//   - If the input matches a letter character, it will return a slice of all matched letters.
 //   - If the input is empty, it will return io.EOF.
-//   - If the input doesn't match a numerical character, it will return parser.ErrNotMatched.
-func Digit1() parser.Parser[parser.Reader, []byte] {
+//   - If the input doesn't match a letter character, it will return parser.ErrNotMatched.
+func Alpha1() parser.Parser[parser.Reader, []byte] {
 	return func(in parser.Reader) ([]byte, error) {
 		b, err := in.ReadByte()
 		if err != nil {
 			return nil, err
 		}
 
-		if !IsDigit(b) {
+		if !IsLetter(b) {
 			_, _ = in.Seek(-1, io.SeekCurrent)
 			return nil, parser.ErrNotMatched
 		}
@@ -69,7 +71,9 @@ func Digit1() parser.Parser[parser.Reader, []byte] {
 			b, err := in.ReadByte()
 			if err != nil {
 				return digits, nil
-			} else if !IsDigit(b) {
+			}
+
+			if !IsLetter(b) {
 				_, _ = in.Seek(-1, io.SeekCurrent)
 				return digits, nil
 			}

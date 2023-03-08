@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// Skip will skip over a byte if it matches the predicate.
 func Skip(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Empty] {
 	return func(in parser.Reader) (parser.Empty, error) {
 		b, err := in.ReadByte()
@@ -21,32 +22,25 @@ func Skip(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Empty] {
 	}
 }
 
-func SkipN(n uint) parser.Parser[parser.Reader, parser.Empty] {
-	return func(in parser.Reader) (parser.Empty, error) {
-		currentOffset, _ := in.Seek(0, io.SeekCurrent)
-		_, err := in.Seek(int64(n), io.SeekCurrent)
-		if err != nil {
-			_, _ = in.Seek(currentOffset, io.SeekStart)
-		}
-		return nil, err
-	}
-}
-
-func Skip0(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Empty] {
+// SkipWhile will skip over zero or more bytes that match the predicate.
+func SkipWhile(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Empty] {
 	return func(in parser.Reader) (parser.Empty, error) {
 		for {
 			b, err := in.ReadByte()
-			if err != nil || !p(b) {
-				break
+			if err != nil {
+				return nil, nil
+			}
+			if !p(b) {
+				_, _ = in.Seek(-1, io.SeekCurrent)
+				return nil, nil
 			}
 		}
 
-		_, _ = in.Seek(-1, io.SeekCurrent)
-		return nil, nil
 	}
 }
 
-func Skip1(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Empty] {
+// SkipWhile1 will skip over one or more bytes that match the predicate.
+func SkipWhile1(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Empty] {
 	return func(in parser.Reader) (parser.Empty, error) {
 		b, err := in.ReadByte()
 		if err != nil {
@@ -59,13 +53,14 @@ func Skip1(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Empty] 
 		}
 
 		for {
-			b, err := in.ReadByte()
-			if err != nil || !p(b) {
-				break
+			b, err = in.ReadByte()
+			if err != nil {
+				return nil, nil
+			}
+			if !p(b) {
+				_, _ = in.Seek(-1, io.SeekCurrent)
+				return nil, nil
 			}
 		}
-
-		_, _ = in.Seek(-1, io.SeekCurrent)
-		return nil, nil
 	}
 }

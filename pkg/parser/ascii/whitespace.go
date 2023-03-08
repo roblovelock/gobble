@@ -35,9 +35,9 @@ func SkipWhitespace() parser.Parser[parser.Reader, parser.Empty] {
 }
 
 func SkipWhitespace0() parser.Parser[parser.Reader, parser.Empty] {
-	return bytes.Skip0(IsWhitespace)
+	return bytes.SkipWhile(IsWhitespace)
 }
 
 func SkipWhitespace1() parser.Parser[parser.Reader, parser.Empty] {
-	return bytes.Skip1(IsWhitespace)
+	return bytes.SkipWhile1(IsWhitespace)
 }
