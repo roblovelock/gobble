@@ -35,7 +35,6 @@ func SkipWhile(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Emp
 				return nil, nil
 			}
 		}
-
 	}
 }
 

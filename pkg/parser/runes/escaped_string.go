@@ -3,7 +3,6 @@ package runes
 import (
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
-	"strings"
 	"unicode/utf16"
 )
 
@@ -16,12 +15,13 @@ func EscapedString() parser.Parser[parser.Reader, string] {
 			return "", parser.ErrNotMatched
 		}
 
-		currentOffset, _ := in.Seek(0, io.SeekCurrent)
-		var builder strings.Builder
+		var result []rune
+		startOffset, _ := in.Seek(0, io.SeekCurrent)
+		currentOffset := startOffset
 		for {
 			r, _, err := in.ReadRune()
 			if err != nil {
-				_, _ = in.Seek(currentOffset-1, io.SeekStart)
+				_, _ = in.Seek(startOffset-1, io.SeekStart)
 				return "", err
 			}
 
@@ -30,18 +30,30 @@ func EscapedString() parser.Parser[parser.Reader, string] {
 			}
 
 			if r == '\\' {
+				result = append(result, readRunes(in, currentOffset)...)
 				r, err = readSpecial(in)
 				if err != nil {
-					_, _ = in.Seek(currentOffset-1, io.SeekStart)
+					_, _ = in.Seek(startOffset-1, io.SeekStart)
 					return "", err
 				}
+				result = append(result, r)
+				currentOffset, _ = in.Seek(0, io.SeekCurrent)
 			}
-
-			builder.WriteRune(r)
 		}
 
-		return builder.String(), nil
+		result = append(result, readRunes(in, currentOffset)...)
+		return string(result), nil
 	}
+}
+
+func readRunes(in parser.Reader, start int64) []rune {
+	end, _ := in.Seek(0, io.SeekCurrent)
+	_, _ = in.Seek(start, io.SeekStart)
+	result := make([]byte, end-start-1)
+	_, _ = in.Read(result)
+	_, _ = in.Seek(end, io.SeekStart)
+
+	return []rune(string(result))
 }
 
 func readSpecial(in parser.Reader) (rune, error) {

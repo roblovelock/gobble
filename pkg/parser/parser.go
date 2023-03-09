@@ -33,7 +33,7 @@ type (
 	}
 )
 
-func Ptr[R Reader, T any](p *Parser[R, T]) Parser[R, T] {
+func Pointer[R Reader, T any](p *Parser[R, T]) Parser[R, T] {
 	return func(in R) (T, error) {
 		return (*p)(in)
 	}

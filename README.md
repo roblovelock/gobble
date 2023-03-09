@@ -20,7 +20,7 @@ import (
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"image/color"
 	"strconv"
-	"strings"
+	"github.com/roblovelock/gobble/pkg/parser/strings"
 )
 
 var (

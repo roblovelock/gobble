@@ -19,9 +19,9 @@ cpu: AMD Ryzen 7 2700 Eight-Core Processor
 | BenchmarkJSONBool   | 6407236 | 183.7    | 36      | 2         |
 | BenchmarkJSONNull   | 6457402 | 182.7    | 36      | 2         |
 | BenchmarkJSONArray  | 535045  | 2105     | 424     | 18        |
-| BenchmarkJSONMap    | 194258  | 5956     | 1472    | 42        |
-| BenchmarkJSONMedium | 5558    | 204297   | 54258   | 1097      |
-| BenchmarkJSONLarge  | 45      | 26507384 | 6427878 | 132411    |
+| BenchmarkJSONMap    | 222570  | 5267     | 992     | 38        |
+| BenchmarkJSONMedium | 5989    | 187604   | 43469   | 1155      |
+| BenchmarkJSONLarge  | 48      | 24559352 | 5208630 | 139985    |
 
 ### [goparsec](https://github.com/prataprc/goparsec)
 

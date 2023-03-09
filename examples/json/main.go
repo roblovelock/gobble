@@ -8,7 +8,6 @@ import (
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
-	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"strconv"
 	"strings"
 )
@@ -16,40 +15,66 @@ import (
 var (
 	numericCheck = [256]bool{}
 
-	ws         = ascii.SkipWhitespace0()
+	jsonValue    parser.Parser[parser.Reader, interface{}]
+	jsonValuePtr = parser.Pointer(&jsonValue)
+
+	ws         = ascii.SkipBlankSpace0()
 	openSqrt   = bytes.Byte('[')
 	closeSqrt  = bytes.Byte(']')
 	openBrace  = bytes.Byte('{')
 	closeBrace = bytes.Byte('}')
 	comma      = bytes.Byte(',')
 	colon      = bytes.Byte(':')
+	quote      = bytes.Byte('"')
 
-	stringVal  = runes.EscapedString()
+	untypedValue = modifier.Value[parser.Reader, []byte, interface{}]
+
+	nullVal   = untypedValue(bytes.Tag([]byte("null")), nil)
+	trueVal   = untypedValue(bytes.Tag([]byte("true")), true)
+	falseVal  = untypedValue(bytes.Tag([]byte("false")), false)
+	stringVal = sequence.Delimited(
+		quote,
+		bytes.Escaped(
+			func(b byte) bool {
+				return b != '"'
+			},
+			'\\',
+			func(b byte) bool {
+				switch b {
+				case '"', 'n', '\\':
+					return true
+				default:
+					return false
+				}
+			}),
+		quote,
+	)
+	//stringVal  = runes.EscapedString()
 	numericVal = modifier.Map(
 		bytes.TakeWhile(func(b byte) bool { return numericCheck[b] }),
 		func(b []byte) (interface{}, error) {
 			return strconv.ParseFloat(string(b), 64)
 		},
 	)
+	arrayVal = sequence.Delimited(
+		openSqrt, multi.Separated0(jsonValuePtr, sequence.Preceded(ws, comma)), sequence.Preceded(ws, closeSqrt),
+	)
 
-	nullVal  = modifier.Value[parser.Reader, []byte, interface{}](bytes.Tag([]byte("null")), nil)
-	trueVal  = modifier.Value(bytes.Tag([]byte("true")), true)
-	falseVal = modifier.Value(bytes.Tag([]byte("false")), false)
-
-	fieldName = sequence.Terminated(stringVal, ws)
-
-	val parser.Parser[parser.Reader, interface{}]
+	fieldName = sequence.Preceded(ws, stringVal)
+	objVal    = sequence.Delimited(
+		openBrace,
+		sequence.KeyValue0(fieldName, sequence.Preceded(ws, colon), jsonValuePtr, sequence.Preceded(ws, comma)),
+		sequence.Preceded(ws, closeBrace),
+	)
 )
 
 func init() {
-	var arrayVal parser.Parser[parser.Reader, []interface{}]
-	var objVal parser.Parser[parser.Reader, map[string]interface{}]
 	parsers := map[byte]parser.Parser[parser.Reader, interface{}]{
 		'"': parser.Untyped(stringVal),
-		't': parser.Untyped(trueVal),
-		'f': parser.Untyped(falseVal),
-		'[': parser.Untyped(parser.Ptr(&arrayVal)),
-		'{': parser.Untyped(parser.Ptr(&objVal)),
+		'[': parser.Untyped(parser.Pointer(&arrayVal)),
+		'{': parser.Untyped(parser.Pointer(&objVal)),
+		't': trueVal,
+		'f': falseVal,
 		'n': nullVal,
 		'-': numericVal,
 		'+': numericVal,
@@ -66,29 +91,10 @@ func init() {
 	numericCheck['e'] = true
 	numericCheck['E'] = true
 
-	val = sequence.Delimited(ws, branch.PeekCase(parsers), ws)
-
-	arrayVal = sequence.Delimited(
-		openSqrt, multi.Separated0(val, comma), closeSqrt,
-	)
-
-	field := sequence.SeparatedPair(fieldName, colon, val)
-
-	objVal = modifier.Map(sequence.Delimited(
-		sequence.Terminated(openBrace, ws),
-		multi.Separated0(field, sequence.Delimited(ws, comma, ws)),
-		sequence.Preceded(ws, closeBrace),
-	), func(pairs []parser.Pair[string, interface{}]) (map[string]interface{}, error) {
-		m := make(map[string]interface{}, len(pairs))
-		for _, p := range pairs {
-			m[p.First] = p.Second
-		}
-		return m, nil
-	},
-	)
+	jsonValue = sequence.Preceded(ws, branch.PeekCase(parsers))
 }
 
 func ParseJSON(json string) (interface{}, error) {
 	reader := strings.NewReader(json)
-	return val(reader)
+	return jsonValue(reader)
 }

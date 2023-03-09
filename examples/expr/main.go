@@ -52,7 +52,7 @@ func init() {
 	// num | "(" expr ")"
 	value := sequence.Delimited(
 		multi.Many0(ascii.Whitespace()),
-		branch.Alt(ascii.Int64(), sequence.Delimited(openParan, parser.Ptr(&sum), closeParan)),
+		branch.Alt(ascii.Int64(), sequence.Delimited(openParan, parser.Pointer(&sum), closeParan)),
 		multi.Many0(ascii.Whitespace()),
 	)
 
