@@ -2,6 +2,7 @@ package modifier_test
 
 import (
 	"github.com/roblovelock/gobble/pkg/combinator/modifier"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
@@ -38,7 +39,7 @@ func TestNot(t *testing.T) {
 				input:  strings.NewReader("12"),
 			},
 			wantRemain: "12",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "not matched parser => match",

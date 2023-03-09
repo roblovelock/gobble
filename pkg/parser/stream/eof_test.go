@@ -1,6 +1,7 @@
 package stream_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/stream"
 	"github.com/stretchr/testify/assert"
@@ -27,7 +28,7 @@ func TestEOF(t *testing.T) {
 		{
 			name:       "not at end => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "a",
 		},
 	}

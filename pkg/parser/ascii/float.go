@@ -40,7 +40,7 @@ func floatParser[T floatConstraint](
 		modifier.Optional(sign),
 		branch.Alt(
 			sequence.Terminated(Digit1(), modifier.Optional(sequence.Preceded(point, Digit1()))),
-			sequence.Preceded(point, Digit1()),
+			modifier.Cut(sequence.Preceded(point, Digit1())),
 		),
 		modifier.Optional(sequence.Delimited(
 			bytes.OneOf('e', 'E'),

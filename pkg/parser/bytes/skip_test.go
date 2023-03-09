@@ -1,6 +1,7 @@
 package bytes_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
@@ -31,7 +32,7 @@ func TestSkip(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{predicate: ascii.IsWhitespace, input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
@@ -149,7 +150,7 @@ func TestSkip1(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{predicate: ascii.IsWhitespace, input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{

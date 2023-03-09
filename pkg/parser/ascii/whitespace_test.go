@@ -1,6 +1,7 @@
 package ascii_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +31,7 @@ func TestWhitespace(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
@@ -151,7 +152,7 @@ func TestWhitespace1(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
@@ -196,7 +197,7 @@ func TestSkipWhitespace(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
@@ -312,7 +313,7 @@ func TestSkipWhitespace1(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{

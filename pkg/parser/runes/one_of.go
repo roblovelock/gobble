@@ -1,6 +1,7 @@
 package runes
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 	"strings"
@@ -25,7 +26,7 @@ func OneOf(runes ...rune) parser.Parser[parser.Reader, rune] {
 		}
 
 		_, _ = in.Seek(-int64(i), io.SeekCurrent)
-		return 0, parser.ErrNotMatched
+		return 0, errors.ErrNotMatched
 	}
 }
 

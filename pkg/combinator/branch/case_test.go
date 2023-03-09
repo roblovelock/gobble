@@ -1,6 +1,7 @@
 package branch
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
@@ -42,7 +43,7 @@ func TestCase(t *testing.T) {
 				input:        strings.NewReader("a"),
 			},
 			wantRemain: "a",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "matched parser EOF => EOF",
@@ -66,7 +67,7 @@ func TestCase(t *testing.T) {
 				input: strings.NewReader("ac"),
 			},
 			wantRemain: "ac",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "matched parser match => match",
@@ -144,7 +145,7 @@ func TestCaseOrDefault(t *testing.T) {
 				input:         strings.NewReader("ac"),
 			},
 			wantRemain: "ac",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "default parser no match => no match",
@@ -157,7 +158,7 @@ func TestCaseOrDefault(t *testing.T) {
 				input:         strings.NewReader("ac"),
 			},
 			wantRemain: "ac",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "matched parser match => match",
@@ -225,7 +226,7 @@ func TestPeekCase(t *testing.T) {
 				input:       strings.NewReader("a"),
 			},
 			wantRemain: "a",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "matched parser no match => no match",
@@ -236,7 +237,7 @@ func TestPeekCase(t *testing.T) {
 				input: strings.NewReader("ab"),
 			},
 			wantRemain: "ab",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "matched parser match => match",

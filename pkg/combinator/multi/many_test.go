@@ -1,6 +1,7 @@
 package multi
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
@@ -87,7 +88,7 @@ func TestMany1(t *testing.T) {
 		{
 			name:       "rune mismatch => no match",
 			args:       args{p: runes.Rune('a'), input: strings.NewReader("b")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "b",
 		},
 		{
@@ -201,7 +202,7 @@ func TestMany1Count(t *testing.T) {
 		{
 			name:       "rune mismatch => no match",
 			args:       args{p: runes.Rune('a'), input: strings.NewReader("b")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "b",
 		},
 		{

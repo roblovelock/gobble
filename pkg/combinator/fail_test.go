@@ -1,6 +1,7 @@
 package combinator
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,19 +24,19 @@ func TestFail(t *testing.T) {
 		{
 			name: "empty input => success",
 			args: args{
-				err:   parser.ErrNotMatched,
+				err:   errors.ErrNotMatched,
 				input: strings.NewReader(""),
 			},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "",
 		},
 		{
 			name: "input => success",
 			args: args{
-				err:   parser.ErrNotMatched,
+				err:   errors.ErrNotMatched,
 				input: strings.NewReader("ab"),
 			},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "ab",
 		},
 	}

@@ -1,6 +1,7 @@
 package runes
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 	"unicode/utf16"
@@ -12,7 +13,7 @@ func EscapedString() parser.Parser[parser.Reader, string] {
 			return "", err
 		} else if b != '"' {
 			_, _ = in.Seek(-1, io.SeekCurrent)
-			return "", parser.ErrNotMatched
+			return "", errors.ErrNotMatched
 		}
 
 		var result []rune
@@ -78,7 +79,7 @@ func readSpecial(in parser.Reader) (rune, error) {
 	case 'u':
 		return decodeUnicode(in)
 	default:
-		return 0, parser.ErrNotMatched
+		return 0, errors.ErrNotMatched
 	}
 }
 
@@ -100,7 +101,7 @@ func decodeUnicode(in parser.Reader) (rune, error) {
 			return 0, io.EOF
 		}
 		if unicodeBuffer[0] != '\\' || unicodeBuffer[1] != 'u' {
-			return 0, parser.ErrNotMatched
+			return 0, errors.ErrNotMatched
 		}
 		r2, err := unicodeToRune(unicodeBuffer[2:])
 		if err != nil {
@@ -171,6 +172,6 @@ func hexToRune(b byte) (rune, error) {
 	case 'f':
 		return 15, nil
 	default:
-		return 0, parser.ErrNotMatched
+		return 0, errors.ErrNotMatched
 	}
 }

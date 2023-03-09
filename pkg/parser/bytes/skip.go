@@ -1,6 +1,7 @@
 package bytes
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -15,7 +16,7 @@ func Skip(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Empty] {
 
 		if !p(b) {
 			_, _ = in.Seek(-1, io.SeekCurrent)
-			return nil, parser.ErrNotMatched
+			return nil, errors.ErrNotMatched
 		}
 
 		return nil, nil
@@ -48,7 +49,7 @@ func SkipWhile1(p parser.Predicate[byte]) parser.Parser[parser.Reader, parser.Em
 
 		if !p(b) {
 			_, _ = in.Seek(-1, io.SeekCurrent)
-			return nil, parser.ErrNotMatched
+			return nil, errors.ErrNotMatched
 		}
 
 		for {

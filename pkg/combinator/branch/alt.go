@@ -1,7 +1,7 @@
 package branch
 
 import (
-	"errors"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 )
 
@@ -11,12 +11,12 @@ func Alt[R parser.Reader, T any](parsers ...parser.Parser[R, T]) parser.Parser[R
 		for _, p := range parsers {
 			if r, err := p(in); err == nil {
 				return r, nil
-			} else if !errors.Is(err, parser.ErrNotMatched) {
-				var r T
-				return r, err
+			} else if errors.IsFatal(err) {
+				var t T
+				return t, err
 			}
 		}
 		var r T
-		return r, parser.ErrNotMatched
+		return r, errors.ErrNotMatched
 	}
 }

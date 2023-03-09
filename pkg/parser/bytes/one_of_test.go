@@ -2,6 +2,7 @@ package bytes_test
 
 import (
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"github.com/stretchr/testify/assert"
@@ -67,19 +68,19 @@ func TestOneOf(t *testing.T) {
 		{
 			name:       "empty bytes => no match",
 			args:       args{bytes: []byte{}, input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "byte mismatch => no match",
 			args:       args{bytes: []byte{'a'}, input: strings.NewReader("b")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'b'},
 		},
 		{
 			name:       "bytes mismatch => no match",
 			args:       args{bytes: []byte{'a', 'b', 'c'}, input: strings.NewReader("d")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'d'},
 		},
 		{
@@ -168,19 +169,19 @@ func TestOneOf1(t *testing.T) {
 		{
 			name:       "empty bytes => no match",
 			args:       args{bytes: []byte{}, input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "byte mismatch => no match",
 			args:       args{bytes: []byte{'a'}, input: strings.NewReader("b")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'b'},
 		},
 		{
 			name:       "bytes mismatch => no match",
 			args:       args{bytes: []byte{'a', 'b', 'c'}, input: strings.NewReader("d")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'d'},
 		},
 		{

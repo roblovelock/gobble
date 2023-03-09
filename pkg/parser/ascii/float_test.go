@@ -1,6 +1,7 @@
 package ascii_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
@@ -22,26 +23,27 @@ func TestFloat64(t *testing.T) {
 		wantErr    error
 	}{
 		{
-			name:    "empty input => EOF",
-			args:    args{input: strings.NewReader("")},
-			wantErr: io.EOF,
+			name:       "empty input => EOF",
+			args:       args{input: strings.NewReader("")},
+			wantRemain: []byte{},
+			wantErr:    io.EOF,
 		},
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative non digit => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive non digit => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{

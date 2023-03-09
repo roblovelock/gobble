@@ -2,6 +2,7 @@ package modifier_test
 
 import (
 	"github.com/roblovelock/gobble/pkg/combinator/modifier"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
@@ -41,7 +42,7 @@ func TestValue(t *testing.T) {
 				value:  "match",
 				input:  strings.NewReader("a"),
 			},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{

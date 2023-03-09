@@ -1,6 +1,7 @@
 package runes
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 	"math"
@@ -48,7 +49,7 @@ func TakeWhileMinMax(min, max int, predicate parser.Predicate[rune]) parser.Pars
 			r, n, err := in.ReadRune()
 			if err == nil && !predicate(r) {
 				_, _ = in.Seek(-int64(n), io.SeekCurrent)
-				err = parser.ErrNotMatched
+				err = errors.ErrNotMatched
 			}
 			if err != nil {
 				if builder.Len() < min {

@@ -1,6 +1,7 @@
 package modifier
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -16,7 +17,7 @@ func Verify[R parser.Reader, T any](p parser.Parser[R, T], predicate parser.Pred
 		if !predicate(r) {
 			var r T
 			_, _ = in.Seek(currentOffset, io.SeekStart)
-			return r, parser.ErrNotMatched
+			return r, errors.ErrNotMatched
 		}
 
 		return r, nil

@@ -1,6 +1,7 @@
 package ascii_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +30,7 @@ func TestDigit(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
@@ -81,7 +82,7 @@ func TestDigit1(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{

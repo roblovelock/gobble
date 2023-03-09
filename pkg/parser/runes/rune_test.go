@@ -2,6 +2,7 @@ package runes_test
 
 import (
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
@@ -68,7 +69,7 @@ func TestRune(t *testing.T) {
 			name:       "rune mismatch => no match",
 			args:       args{rune: 'a', input: strings.NewReader("b")},
 			wantRemain: "b",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name:      "rune match => match",

@@ -1,6 +1,7 @@
 package multi
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -13,7 +14,7 @@ func TakeWhileMN[R parser.Reader, T any](p parser.Parser[R, T], m, n int, predic
 		for i := 0; i < n; i++ {
 			r, err := p(in)
 			if err == nil && !predicate(r) {
-				err = parser.ErrNotMatched
+				err = errors.ErrNotMatched
 			}
 			if err != nil {
 				if len(result) < m {

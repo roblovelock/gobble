@@ -1,6 +1,7 @@
 package branch
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -21,7 +22,7 @@ func Case[R parser.Reader, C comparable, T any](
 		if !ok {
 			var t T
 			_, _ = in.Seek(currentOffset, io.SeekStart)
-			return t, parser.ErrNotMatched
+			return t, errors.ErrNotMatched
 		}
 
 		result, err := choice(in)
@@ -73,7 +74,7 @@ func PeekCase[R parser.Reader, T any](parsers map[byte]parser.Parser[R, T]) pars
 		p, ok := parsers[b]
 		if !ok {
 			var t T
-			return t, parser.ErrNotMatched
+			return t, errors.ErrNotMatched
 		}
 
 		return p(in)

@@ -1,6 +1,7 @@
 package ascii
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"io"
@@ -16,7 +17,7 @@ func Whitespace() parser.Parser[parser.Reader, byte] {
 
 		if !IsWhitespace(b) {
 			_, _ = in.Seek(-1, io.SeekCurrent)
-			return 0, parser.ErrNotMatched
+			return 0, errors.ErrNotMatched
 		}
 
 		return b, nil

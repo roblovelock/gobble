@@ -2,6 +2,7 @@ package bytes
 
 import (
 	"bytes"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -21,7 +22,7 @@ func Tag(b []byte) parser.Parser[parser.Reader, []byte] {
 
 		if bytes.Compare(b, result) != 0 {
 			_, _ = in.Seek(-int64(n), io.SeekCurrent)
-			return nil, parser.ErrNotMatched
+			return nil, errors.ErrNotMatched
 		}
 
 		return result, nil

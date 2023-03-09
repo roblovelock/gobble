@@ -13,15 +13,15 @@ cpu: AMD Ryzen 7 2700 Eight-Core Processor
 
 | benchmark           | op      | ns/op    | B/op    | allocs/op |
 |---------------------|---------|----------|---------|-----------|
-| BenchmarkJSONInt    | 3415627 | 340.2    | 56      | 4         |
-| BenchmarkJSONFloat  | 2854645 | 426.5    | 80      | 5         |
-| BenchmarkJSONString | 3179964 | 371.4    | 72      | 4         |
-| BenchmarkJSONBool   | 6407236 | 183.7    | 36      | 2         |
-| BenchmarkJSONNull   | 6457402 | 182.7    | 36      | 2         |
-| BenchmarkJSONArray  | 535045  | 2105     | 424     | 18        |
-| BenchmarkJSONMap    | 222570  | 5267     | 992     | 38        |
-| BenchmarkJSONMedium | 5989    | 187604   | 43469   | 1155      |
-| BenchmarkJSONLarge  | 48      | 24559352 | 5208630 | 139985    |
+| BenchmarkJSONInt    | 3942469 | 297.0    | 48      | 4         |
+| BenchmarkJSONFloat  | 3089312 | 383.1    | 72      | 4         |
+| BenchmarkJSONString | 3363133 | 343.4    | 80      | 4         |
+| BenchmarkJSONBool   | 7569798 | 163.1    | 36      | 2         |
+| BenchmarkJSONNull   | 7290391 | 160.1    | 36      | 2         |
+| BenchmarkJSONArray  | 488611  | 2122     | 408     | 17        |
+| BenchmarkJSONMap    | 236360  | 4948     | 968     | 35        |
+| BenchmarkJSONMedium | 5988    | 184881   | 43049   | 1142      |
+| BenchmarkJSONLarge  | 49      | 25049261 | 5154790 | 138479    |
 
 ### [goparsec](https://github.com/prataprc/goparsec)
 

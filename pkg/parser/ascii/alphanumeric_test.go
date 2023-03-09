@@ -1,6 +1,7 @@
 package ascii_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +30,7 @@ func TestAlphanumeric(t *testing.T) {
 		{
 			name:       "non alphanumeric => no match",
 			args:       args{input: strings.NewReader("+")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+'},
 		},
 		{
@@ -87,7 +88,7 @@ func TestAlphanumeric1(t *testing.T) {
 		{
 			name:       "non alphanumeric => no match",
 			args:       args{input: strings.NewReader("+")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+'},
 		},
 		{

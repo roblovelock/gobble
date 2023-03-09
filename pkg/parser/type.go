@@ -1,5 +1,9 @@
 package parser
 
+import (
+	"github.com/roblovelock/gobble/pkg/errors"
+)
+
 func Untyped[R Reader, T any](p Parser[R, T]) Parser[R, interface{}] {
 	return func(in R) (interface{}, error) {
 		return p(in)
@@ -12,7 +16,7 @@ func Typed[R Reader, T any](p Parser[R, interface{}]) Parser[R, T] {
 		val, ok := r.(T)
 		if !ok {
 			var t T
-			return t, ErrNotMatched
+			return t, errors.ErrNotMatched
 		}
 		return val, err
 	}

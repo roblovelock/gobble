@@ -1,6 +1,7 @@
 package ascii_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
@@ -30,19 +31,19 @@ func TestUInt8(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{
@@ -118,19 +119,19 @@ func TestUInt16(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{
@@ -206,19 +207,19 @@ func TestUInt32(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{
@@ -294,19 +295,19 @@ func TestUInt64(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{
@@ -382,19 +383,19 @@ func TestInt8(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{
@@ -488,19 +489,19 @@ func TestInt16(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{
@@ -594,19 +595,19 @@ func TestInt32(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{
@@ -700,19 +701,19 @@ func TestInt64(t *testing.T) {
 		{
 			name:       "non digit => no match",
 			args:       args{input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'a'},
 		},
 		{
 			name:       "negative => no match",
 			args:       args{input: strings.NewReader("-a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'-', 'a'},
 		},
 		{
 			name:       "positive => no match",
 			args:       args{input: strings.NewReader("+a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'+', 'a'},
 		},
 		{

@@ -1,6 +1,7 @@
 package runes_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
@@ -29,13 +30,13 @@ func TestEscapedString(t *testing.T) {
 		{
 			name:       "no opening quote => no match",
 			args:       args{input: strings.NewReader(`a"`)},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: `a"`,
 		},
 		{
 			name:       "invalid escape character => no match",
 			args:       args{input: strings.NewReader(`"\g"`)},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: `"\g"`,
 		},
 		{
@@ -77,19 +78,19 @@ func TestEscapedString(t *testing.T) {
 		{
 			name:       "unicode surrogate invalid => no match",
 			args:       args{input: strings.NewReader(`"\ud83e Some invalid text"`)},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: `"\ud83e Some invalid text"`,
 		},
 		{
 			name:       "invalid unicode characters => no match",
 			args:       args{input: strings.NewReader(`"\u123X"`)},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: `"\u123X"`,
 		},
 		{
 			name:       "invalid unicode surrogate characters => no match",
 			args:       args{input: strings.NewReader(`"\ud83e\udd2X"`)},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: `"\ud83e\udd2X"`,
 		},
 		{

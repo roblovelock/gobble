@@ -1,6 +1,7 @@
 package ascii_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/stretchr/testify/assert"
@@ -35,7 +36,7 @@ func TestCRLF(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{input: strings.NewReader("\r\r")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'\r', '\r'},
 		},
 		{
@@ -82,7 +83,7 @@ func TestNewline(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{input: strings.NewReader("\r")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'\r'},
 		},
 		{
@@ -132,7 +133,7 @@ func TestLineEnding(t *testing.T) {
 		{
 			name:       "no match => not matched",
 			args:       args{input: strings.NewReader("\r\r")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'\r', '\r'},
 		},
 		{

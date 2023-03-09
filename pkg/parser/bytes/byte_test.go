@@ -2,6 +2,7 @@ package bytes_test
 
 import (
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"github.com/stretchr/testify/assert"
@@ -68,7 +69,7 @@ func TestByte(t *testing.T) {
 			name:       "byte mismatch => no match",
 			args:       args{byte: 'a', input: strings.NewReader("b")},
 			wantRemain: []byte{'b'},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name:       "byte match => match",

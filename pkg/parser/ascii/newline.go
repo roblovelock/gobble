@@ -2,6 +2,7 @@
 package ascii
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"io"
@@ -38,7 +39,7 @@ func LineEnding() parser.Parser[parser.Reader, []byte] {
 		}
 		if b != '\r' {
 			_, _ = in.Seek(-1, io.SeekCurrent)
-			return nil, parser.ErrNotMatched
+			return nil, errors.ErrNotMatched
 		}
 		b, err = in.ReadByte()
 		if err != nil {
@@ -47,7 +48,7 @@ func LineEnding() parser.Parser[parser.Reader, []byte] {
 		}
 		if b != '\n' {
 			_, _ = in.Seek(-2, io.SeekCurrent)
-			return nil, parser.ErrNotMatched
+			return nil, errors.ErrNotMatched
 		}
 
 		return []byte{'\r', '\n'}, nil

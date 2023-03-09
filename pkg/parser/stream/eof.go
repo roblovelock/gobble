@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -13,6 +14,6 @@ func EOF() parser.Parser[parser.Reader, parser.Empty] {
 			return nil, nil
 		}
 		_, _ = in.Seek(-1, io.SeekCurrent)
-		return nil, parser.ErrNotMatched
+		return nil, errors.ErrNotMatched
 	}
 }

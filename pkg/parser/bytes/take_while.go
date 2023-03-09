@@ -1,6 +1,7 @@
 package bytes
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 	"math"
@@ -28,44 +29,30 @@ func TakeWhile1(predicate parser.Predicate[byte]) parser.Parser[parser.Reader, [
 //   - If the number of matched bytes < m, it will return parser.ErrNotMatched
 func TakeWhileMinMax(min, max int, predicate parser.Predicate[byte]) parser.Parser[parser.Reader, []byte] {
 	return func(in parser.Reader) ([]byte, error) {
-		result, err := readMin(min, predicate, in)
-		if err != nil {
-			return nil, err
-		}
-
-		for i := min; i < max; i++ {
+		startOffset, _ := in.Seek(0, io.SeekCurrent)
+		n := 0
+		for ; n < max; n++ {
 			b, err := in.ReadByte()
 			if err != nil {
-				return result, nil
+				if n < min {
+					_, _ = in.Seek(startOffset, io.SeekStart)
+					return nil, err
+				}
+				break
 			}
 
 			if !predicate(b) {
-				_, _ = in.Seek(-1, io.SeekCurrent)
-				return result, nil
+				break
 			}
-
-			result = append(result, b)
 		}
+
+		_, _ = in.Seek(startOffset, io.SeekStart)
+		if n < min {
+			return nil, errors.ErrNotMatched
+		}
+		result := make([]byte, n)
+		_, _ = in.Read(result)
 
 		return result, nil
 	}
-}
-
-func readMin(m int, p parser.Predicate[byte], in parser.Reader) ([]byte, error) {
-	result := make([]byte, m)
-	if m > 0 {
-		n, err := in.Read(result)
-		if err != nil {
-			_, _ = in.Seek(-int64(n), io.SeekCurrent)
-			return nil, err
-		}
-
-		for _, r := range result {
-			if !p(r) {
-				_, _ = in.Seek(-int64(n), io.SeekCurrent)
-				return nil, parser.ErrNotMatched
-			}
-		}
-	}
-	return result, nil
 }

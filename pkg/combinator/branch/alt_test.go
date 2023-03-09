@@ -1,6 +1,7 @@
 package branch
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
@@ -25,13 +26,13 @@ func TestAlt(t *testing.T) {
 		wantErr    error
 	}{
 		{
-			name: "empty input => EOF",
+			name: "empty input => no match",
 			args: args{
 				first:  runes.Rune('a'),
 				second: bytes.Byte('b'),
 				input:  strings.NewReader(""),
 			},
-			wantErr: io.EOF,
+			wantErr: errors.ErrNotMatched,
 		},
 		{
 			name: "mismatch => no match",
@@ -41,7 +42,7 @@ func TestAlt(t *testing.T) {
 				input:  strings.NewReader("c"),
 			},
 			wantRemain: "c",
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "first match => match",

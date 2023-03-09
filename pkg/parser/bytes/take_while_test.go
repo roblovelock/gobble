@@ -1,6 +1,7 @@
 package bytes_test
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/ascii"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
@@ -40,7 +41,7 @@ func TestTakeWhileMinMax(t *testing.T) {
 		{
 			name:       "take min 1 no match => empty",
 			args:       args{min: 1, max: 10, predicate: ascii.IsDigit, input: strings.NewReader("b")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'b'},
 		},
 		{
@@ -98,7 +99,7 @@ func TestTakeWhile1(t *testing.T) {
 		{
 			name:       "take no match => empty",
 			args:       args{predicate: ascii.IsDigit, input: strings.NewReader("b")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: []byte{'b'},
 		},
 		{

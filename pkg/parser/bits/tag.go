@@ -1,6 +1,7 @@
 package bits
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 	"math/bits"
@@ -25,7 +26,7 @@ func Tag[T uint8 | uint16 | uint32 | uint64 | uint](n uint8, tag T) parser.Parse
 		}
 		if T(b) != tag {
 			_, _ = in.Seek(currentOffset, io.SeekStart)
-			return t, parser.ErrNotMatched
+			return t, errors.ErrNotMatched
 		}
 
 		return tag, nil

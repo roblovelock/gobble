@@ -1,12 +1,7 @@
 package parser
 
 import (
-	"errors"
 	"io"
-)
-
-var (
-	ErrNotMatched = errors.New("not matched") // parser didn't match input
 )
 
 type (

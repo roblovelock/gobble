@@ -1,6 +1,7 @@
 package modifier
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -14,6 +15,6 @@ func Not[R parser.Reader, T any](p parser.Parser[R, T]) parser.Parser[R, parser.
 		if err != nil {
 			return nil, nil
 		}
-		return nil, parser.ErrNotMatched
+		return nil, errors.ErrNotMatched
 	}
 }

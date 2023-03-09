@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"image/color"
 	"io"
@@ -26,7 +26,7 @@ func TestParse(t *testing.T) {
 		{
 			name:    "invalid input => EOF",
 			args:    args{in: "$"},
-			wantErr: parser.ErrNotMatched,
+			wantErr: errors.ErrNotMatched,
 		},
 		{
 			name: "hex input => color",

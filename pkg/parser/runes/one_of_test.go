@@ -2,6 +2,7 @@ package runes_test
 
 import (
 	"fmt"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
@@ -67,19 +68,19 @@ func TestOneOf(t *testing.T) {
 		{
 			name:       "empty runes => no match",
 			args:       args{runes: []rune{}, input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "a",
 		},
 		{
 			name:       "rune mismatch => no match",
 			args:       args{runes: []rune{'a'}, input: strings.NewReader("b")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "b",
 		},
 		{
 			name:       "runes mismatch => no match",
 			args:       args{runes: []rune{'a', 'b', 'c'}, input: strings.NewReader("d")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "d",
 		},
 		{
@@ -177,19 +178,19 @@ func TestOneOf1(t *testing.T) {
 		{
 			name:       "empty runes => no match",
 			args:       args{runes: []rune{}, input: strings.NewReader("a")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "a",
 		},
 		{
 			name:       "rune mismatch => no match",
 			args:       args{runes: []rune{'a'}, input: strings.NewReader("b")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "b",
 		},
 		{
 			name:       "runes mismatch => no match",
 			args:       args{runes: []rune{'a', 'b', 'c'}, input: strings.NewReader("d")},
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 			wantRemain: "d",
 		},
 		{

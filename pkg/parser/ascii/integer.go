@@ -67,8 +67,9 @@ func Int64() parser.Parser[parser.Reader, int64] {
 }
 
 func signedIntParser[T signedIntConstraint]() parser.Parser[parser.Reader, T] {
-	return branch.Alt(
-		sequence.Preceded(bytes.Byte('-'), intParser(checkedSub[T])),
+	return branch.If(
+		bytes.Byte('-'),
+		intParser(checkedSub[T]),
 		unsignedIntParser[T](),
 	)
 }

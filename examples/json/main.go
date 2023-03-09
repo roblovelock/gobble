@@ -49,7 +49,6 @@ var (
 			}),
 		quote,
 	)
-	//stringVal  = runes.EscapedString()
 	numericVal = modifier.Map(
 		bytes.TakeWhile(func(b byte) bool { return numericCheck[b] }),
 		func(b []byte) (interface{}, error) {
@@ -63,7 +62,7 @@ var (
 	fieldName = sequence.Preceded(ws, stringVal)
 	objVal    = sequence.Delimited(
 		openBrace,
-		sequence.KeyValue0(fieldName, sequence.Preceded(ws, colon), jsonValuePtr, sequence.Preceded(ws, comma)),
+		multi.KeyValue(fieldName, sequence.Preceded(ws, colon), jsonValuePtr, sequence.Preceded(ws, comma)),
 		sequence.Preceded(ws, closeBrace),
 	)
 )

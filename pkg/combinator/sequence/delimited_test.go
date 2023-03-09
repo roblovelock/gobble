@@ -1,6 +1,7 @@
 package sequence
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
@@ -65,7 +66,7 @@ func TestDelimited(t *testing.T) {
 				input:  strings.NewReader(`bb"`),
 			},
 			wantRemain: `bb"`,
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "second rune mismatch => no match",
@@ -76,7 +77,7 @@ func TestDelimited(t *testing.T) {
 				input:  strings.NewReader(`"a"`),
 			},
 			wantRemain: `"a"`,
-			wantErr:    parser.ErrNotMatched,
+			wantErr:    errors.ErrNotMatched,
 		},
 		{
 			name: "second rune match => second match",
