@@ -1,8 +1,6 @@
 package main
 
 import (
-	bytes2 "bytes"
-	"fmt"
 	"github.com/roblovelock/gobble/pkg/combinator/branch"
 	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/combinator/multi"
@@ -14,9 +12,6 @@ import (
 	"github.com/roblovelock/gobble/pkg/parser/stream"
 	"image"
 	"image/color"
-	"image/png"
-	"log"
-	"os"
 )
 
 type pixelContext struct {
@@ -30,35 +25,18 @@ func (p *pixelContext) setColor(c color.NRGBA) {
 	p.p[hash(c)] = c
 }
 
-func main() {
-	qoiImage, err := os.ReadFile("examples/qoi/testdata/qoi_logo.qoi")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	img, err := parseImage(bytes2.NewReader(qoiImage))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	out, err := os.Create("output.png")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = png.Encode(out, img)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Generated image to output.png")
+func parseImage(in parser.Reader) (image.Image, error) {
+	return imageParser().Parse(in)
 }
 
-func parseImage(in parser.Reader) (image.Image, error) {
+func imageParser() parser.Parser[parser.Reader, image.Image] {
 	return modifier.Map(
-		sequence.Pair(
-			headerParser(),
-			pixelParser(),
+		sequence.Terminated(
+			sequence.Pair(
+				headerParser(),
+				pixelParser(),
+			),
+			endParser(),
 		),
 		func(p parser.Pair[image.Rectangle, []color.Color]) (image.Image, error) {
 			img := image.NewNRGBA(p.First)
@@ -67,7 +45,7 @@ func parseImage(in parser.Reader) (image.Image, error) {
 			}
 			return img, nil
 		},
-	)(in)
+	)
 }
 
 func headerParser() parser.Parser[parser.Reader, image.Rectangle] {
@@ -75,7 +53,7 @@ func headerParser() parser.Parser[parser.Reader, image.Rectangle] {
 		sequence.Preceded(
 			bytes.Tag([]byte("qoif")),
 			sequence.Terminated(
-				sequence.Tuple[parser.Reader, uint32](numeric.UInt32BE(), numeric.UInt32BE()),
+				sequence.Tuple[parser.Reader, uint32](numeric.Uint32BE(), numeric.Uint32BE()),
 				bytes.Take(2),
 			),
 		),
@@ -118,77 +96,74 @@ func rgbaParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
 	)
 }
 
-func indexParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
-	return bits.Bits(
-		sequence.Preceded(
-			bits.Tag[uint8](2, 0x00),
-			modifier.Map[parser.BitReader, uint8, []color.Color](
-				bits.Take[uint8](6),
-				func(i uint8) ([]color.Color, error) {
-					ctx.setColor(ctx.p[i])
-					return []color.Color{ctx.c}, nil
-				},
+func indexParser(ctx *pixelContext) parser.Parser[parser.BitReader, []color.Color] {
+	return modifier.Map[parser.BitReader, uint8, []color.Color](
+		branch.Alt(
+			sequence.Terminated(
+				bits.Tag[uint8](6, 0),
+				modifier.Cut(modifier.Not(bits.Tag[uint8](8, 0))),
 			),
+			bits.Take[uint8](6),
 		),
+		func(i uint8) ([]color.Color, error) {
+			ctx.setColor(ctx.p[i])
+			return []color.Color{ctx.c}, nil
+		},
 	)
 }
 
-func diffParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
-	return bits.Bits(
-		sequence.Preceded(
-			bits.Tag[uint8](2, 0x01),
-			modifier.Map(
-				sequence.Tuple[parser.BitReader, uint8](
-					bits.Take[uint8](2), bits.Take[uint8](2), bits.Take[uint8](2),
-				),
-				func(i []uint8) ([]color.Color, error) {
-					ctx.setColor(color.NRGBA{
-						R: ctx.c.R + i[0] - 2, G: ctx.c.G + i[1] - 2, B: ctx.c.B + i[2] - 2, A: ctx.c.A,
-					})
-					return []color.Color{ctx.c}, nil
-				},
-			),
+func diffParser(ctx *pixelContext) parser.Parser[parser.BitReader, []color.Color] {
+	return modifier.Map(
+		sequence.Tuple[parser.BitReader, uint8](
+			bits.Take[uint8](2), bits.Take[uint8](2), bits.Take[uint8](2),
 		),
+		func(i []uint8) ([]color.Color, error) {
+			ctx.setColor(color.NRGBA{
+				R: ctx.c.R + i[0] - 2, G: ctx.c.G + i[1] - 2, B: ctx.c.B + i[2] - 2, A: ctx.c.A,
+			})
+			return []color.Color{ctx.c}, nil
+		},
 	)
 }
 
-func lumaParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
-	return bits.Bits(
-		sequence.Preceded(
-			bits.Tag[uint8](2, 0x02),
-			modifier.Map(
-				sequence.Tuple[parser.BitReader, uint8](
-					bits.Take[uint8](6), bits.Take[uint8](4), bits.Take[uint8](4),
-				),
-				func(i []uint8) ([]color.Color, error) {
-					dg := i[0] - 32
-					dr := i[1] - 8 + dg
-					db := i[2] - 8 + dg
-
-					ctx.setColor(color.NRGBA{R: ctx.c.R + dr, G: ctx.c.G + dg, B: ctx.c.B + db, A: ctx.c.A})
-					return []color.Color{ctx.c}, nil
-				},
-			),
+func lumaParser(ctx *pixelContext) parser.Parser[parser.BitReader, []color.Color] {
+	return modifier.Map(
+		sequence.Tuple[parser.BitReader, uint8](
+			bits.Take[uint8](6), bits.Take[uint8](4), bits.Take[uint8](4),
 		),
+		func(i []uint8) ([]color.Color, error) {
+			dg := i[0] - 32
+			dr := i[1] - 8 + dg
+			db := i[2] - 8 + dg
+
+			ctx.setColor(color.NRGBA{R: ctx.c.R + dr, G: ctx.c.G + dg, B: ctx.c.B + db, A: ctx.c.A})
+			return []color.Color{ctx.c}, nil
+		},
 	)
 }
 
-func runParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
-	return bits.Bits(
-		sequence.Preceded(
-			bits.Tag[uint8](2, 0x03),
-			modifier.Map(
-				bits.Take[uint8](6),
-				func(count uint8) ([]color.Color, error) {
-					c := make([]color.Color, count+1)
-					for i := uint8(0); i <= count; i++ {
-						c[i] = ctx.c
-					}
-					return c, nil
-				},
-			),
-		),
+func runParser(ctx *pixelContext) parser.Parser[parser.BitReader, []color.Color] {
+	return modifier.Map(
+		bits.Take[uint8](6),
+		func(count uint8) ([]color.Color, error) {
+			c := make([]color.Color, count+1)
+			for i := uint8(0); i <= count; i++ {
+				c[i] = ctx.c
+			}
+			return c, nil
+		},
 	)
+}
+
+func bitPixelParser(ctx *pixelContext) parser.Parser[parser.Reader, []color.Color] {
+	parsers := map[uint8]parser.Parser[parser.BitReader, []color.Color]{
+		0x00: indexParser(ctx),
+		0x01: diffParser(ctx),
+		0x02: lumaParser(ctx),
+		0x03: runParser(ctx),
+	}
+
+	return bits.Bits(branch.Case(bits.Take[uint8](2), parsers))
 }
 
 func pixelParser() parser.Parser[parser.Reader, []color.Color] {
@@ -198,13 +173,9 @@ func pixelParser() parser.Parser[parser.Reader, []color.Color] {
 
 	return multi.FoldMany0(
 		branch.Alt(
-			modifier.Value(endParser(), []color.Color{}),
 			rgbParser(&ctx),
 			rgbaParser(&ctx),
-			indexParser(&ctx),
-			diffParser(&ctx),
-			lumaParser(&ctx),
-			runParser(&ctx),
+			bitPixelParser(&ctx),
 		),
 		make([]color.Color, 0),
 		func(img []color.Color, c []color.Color) []color.Color {

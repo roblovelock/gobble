@@ -11,7 +11,7 @@ func ExampleDigit_match() {
 	input := strings.NewReader("123")
 	byteParser := ascii.Digit()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 
@@ -23,7 +23,7 @@ func ExampleDigit_noMatch() {
 	input := strings.NewReader("abc")
 	byteParser := ascii.Digit()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: %d, Error: '%v', Remainder: '%s'", match, err, string(remainder))
 
@@ -35,7 +35,7 @@ func ExampleDigit_endOfFile() {
 	input := strings.NewReader("")
 	byteParser := ascii.Digit()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: %d, Error: '%v', Remainder: '%s'", match, err, string(remainder))
 
@@ -47,7 +47,7 @@ func ExampleDigit1_match() {
 	input := strings.NewReader("123abc")
 	byteParser := ascii.Digit1()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 
@@ -59,7 +59,7 @@ func ExampleDigit1_noMatch() {
 	input := strings.NewReader("abc")
 	byteParser := ascii.Digit1()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
 
@@ -71,7 +71,7 @@ func ExampleDigit1_endOfFile() {
 	input := strings.NewReader("")
 	byteParser := ascii.Digit1()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
 
@@ -83,7 +83,7 @@ func ExampleDigit0_match() {
 	input := strings.NewReader("123abc")
 	byteParser := ascii.Digit0()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 
@@ -95,7 +95,7 @@ func ExampleDigit0_noMatch() {
 	input := strings.NewReader("abc")
 	byteParser := ascii.Digit0()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 
@@ -107,7 +107,7 @@ func ExampleDigit0_endOfFile() {
 	input := strings.NewReader("")
 	byteParser := ascii.Digit0()
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 

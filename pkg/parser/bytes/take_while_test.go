@@ -66,7 +66,7 @@ func TestTakeWhileMinMax(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.TakeWhileMinMax(tt.args.min, tt.args.max, tt.args.predicate)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -112,7 +112,7 @@ func TestTakeWhile1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.TakeWhile1(tt.args.predicate)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -159,7 +159,7 @@ func TestTakeWhile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.TakeWhile(tt.args.predicate)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.NoError(t, err)

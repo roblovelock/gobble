@@ -49,7 +49,7 @@ func TestAlpha(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.Alpha()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -101,7 +101,7 @@ func TestAlpha1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.Alpha1()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -153,7 +153,7 @@ func TestAlpha0(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.Alpha0()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.NoError(t, err)

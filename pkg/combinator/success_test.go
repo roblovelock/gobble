@@ -42,7 +42,7 @@ func TestSuccess(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := Success[parser.Reader, string](tt.args.value)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.NoError(t, err)

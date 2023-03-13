@@ -7,44 +7,52 @@ import (
 	"unicode/utf16"
 )
 
-func EscapedString() parser.Parser[parser.Reader, string] {
-	return func(in parser.Reader) (string, error) {
-		if b, err := in.ReadByte(); err != nil {
+type (
+	escapedStringParser struct{}
+)
+
+var escapedStringParserInstance = &escapedStringParser{}
+
+func (o *escapedStringParser) Parse(in parser.Reader) (string, error) {
+	if b, err := in.ReadByte(); err != nil {
+		return "", err
+	} else if b != '"' {
+		_, _ = in.Seek(-1, io.SeekCurrent)
+		return "", errors.ErrNotMatched
+	}
+
+	var result []rune
+	startOffset, _ := in.Seek(0, io.SeekCurrent)
+	currentOffset := startOffset
+	for {
+		r, _, err := in.ReadRune()
+		if err != nil {
+			_, _ = in.Seek(startOffset-1, io.SeekStart)
 			return "", err
-		} else if b != '"' {
-			_, _ = in.Seek(-1, io.SeekCurrent)
-			return "", errors.ErrNotMatched
 		}
 
-		var result []rune
-		startOffset, _ := in.Seek(0, io.SeekCurrent)
-		currentOffset := startOffset
-		for {
-			r, _, err := in.ReadRune()
+		if r == '"' {
+			break
+		}
+
+		if r == '\\' {
+			result = append(result, readRunes(in, currentOffset)...)
+			r, err = readSpecial(in)
 			if err != nil {
 				_, _ = in.Seek(startOffset-1, io.SeekStart)
 				return "", err
 			}
-
-			if r == '"' {
-				break
-			}
-
-			if r == '\\' {
-				result = append(result, readRunes(in, currentOffset)...)
-				r, err = readSpecial(in)
-				if err != nil {
-					_, _ = in.Seek(startOffset-1, io.SeekStart)
-					return "", err
-				}
-				result = append(result, r)
-				currentOffset, _ = in.Seek(0, io.SeekCurrent)
-			}
+			result = append(result, r)
+			currentOffset, _ = in.Seek(0, io.SeekCurrent)
 		}
-
-		result = append(result, readRunes(in, currentOffset)...)
-		return string(result), nil
 	}
+
+	result = append(result, readRunes(in, currentOffset)...)
+	return string(result), nil
+}
+
+func EscapedString() parser.Parser[parser.Reader, string] {
+	return escapedStringParserInstance
 }
 
 func readRunes(in parser.Reader, start int64) []rune {

@@ -70,8 +70,8 @@ var (
 func init() {
 	parsers := map[byte]parser.Parser[parser.Reader, interface{}]{
 		'"': parser.Untyped(stringVal),
-		'[': parser.Untyped(parser.Pointer(&arrayVal)),
-		'{': parser.Untyped(parser.Pointer(&objVal)),
+		'[': parser.Untyped(arrayVal),
+		'{': parser.Untyped(objVal),
 		't': trueVal,
 		'f': falseVal,
 		'n': nullVal,
@@ -95,5 +95,5 @@ func init() {
 
 func ParseJSON(json string) (interface{}, error) {
 	reader := strings.NewReader(json)
-	return jsonValue(reader)
+	return jsonValue.Parse(reader)
 }

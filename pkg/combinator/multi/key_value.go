@@ -1,9 +1,50 @@
 package multi
 
 import (
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
+
+type (
+	keyValueParser[R parser.Reader, F comparable, S1, S2, T any] struct {
+		key   parser.Parser[R, F]
+		s1    parser.Parser[R, S1]
+		value parser.Parser[R, T]
+		s2    parser.Parser[R, S2]
+	}
+)
+
+func (o *keyValueParser[R, F, S1, S2, T]) Parse(in R) (map[F]T, error) {
+	currentOffset, _ := in.Seek(0, io.SeekCurrent)
+	result := make(map[F]T, 7)
+	for {
+		f, err := o.key.Parse(in)
+		if err != nil {
+			_, _ = in.Seek(currentOffset, io.SeekStart)
+			break
+		}
+
+		if _, err := o.s1.Parse(in); err != nil {
+			_, _ = in.Seek(currentOffset, io.SeekStart)
+			break
+		}
+
+		s, err := o.value.Parse(in)
+		if err != nil {
+			_, _ = in.Seek(currentOffset, io.SeekStart)
+			break
+		}
+		result[f] = s
+
+		currentOffset, _ = in.Seek(0, io.SeekCurrent)
+		if _, err := o.s2.Parse(in); err != nil {
+			break
+		}
+	}
+
+	return result, nil
+}
 
 // KeyValue returns a map of key value pairs.
 //
@@ -17,35 +58,8 @@ import (
 func KeyValue[R parser.Reader, F comparable, S1, S2, T any](
 	key parser.Parser[R, F], s1 parser.Parser[R, S1], value parser.Parser[R, T], s2 parser.Parser[R, S2],
 ) parser.Parser[R, map[F]T] {
-	return func(in R) (map[F]T, error) {
-		currentOffset, _ := in.Seek(0, io.SeekCurrent)
-		result := make(map[F]T, 7)
-		for {
-			f, err := key(in)
-			if err != nil {
-				_, _ = in.Seek(currentOffset, io.SeekStart)
-				break
-			}
-
-			if _, err := s1(in); err != nil {
-				_, _ = in.Seek(currentOffset, io.SeekStart)
-				break
-			}
-
-			s, err := value(in)
-			if err != nil {
-				_, _ = in.Seek(currentOffset, io.SeekStart)
-				break
-			}
-			result[f] = s
-
-			currentOffset, _ = in.Seek(0, io.SeekCurrent)
-			if _, err := s2(in); err != nil {
-				break
-			}
-		}
-
-		return result, nil
+	return &keyValueParser[R, F, S1, S2, T]{
+		key: key, s1: s1, value: value, s2: s2,
 	}
 }
 
@@ -61,51 +75,10 @@ func KeyValue[R parser.Reader, F comparable, S1, S2, T any](
 func KeyValue1[R parser.Reader, F comparable, S1, S2, T any](
 	key parser.Parser[R, F], s1 parser.Parser[R, S1], value parser.Parser[R, T], s2 parser.Parser[R, S2],
 ) parser.Parser[R, map[F]T] {
-	return func(in R) (map[F]T, error) {
-		currentOffset, _ := in.Seek(0, io.SeekCurrent)
-		f, err := key(in)
-		if err != nil {
-			return nil, err
-		}
-
-		if _, err := s1(in); err != nil {
-			_, _ = in.Seek(currentOffset, io.SeekStart)
-			return nil, err
-		}
-
-		s, err := value(in)
-		if err != nil {
-			_, _ = in.Seek(currentOffset, io.SeekStart)
-			return nil, err
-		}
-
-		result := map[F]T{f: s}
-
-		for {
-			currentOffset, _ = in.Seek(0, io.SeekCurrent)
-			if _, err := s2(in); err != nil {
-				break
-			}
-
-			f, err = key(in)
-			if err != nil {
-				_, _ = in.Seek(currentOffset, io.SeekStart)
-				break
-			}
-
-			if _, err := s1(in); err != nil {
-				_, _ = in.Seek(currentOffset, io.SeekStart)
-				break
-			}
-
-			s, err = value(in)
-			if err != nil {
-				_, _ = in.Seek(currentOffset, io.SeekStart)
-				break
-			}
-			result[f] = s
-		}
-
-		return result, nil
-	}
+	return modifier.Verify(
+		KeyValue(key, s1, value, s2),
+		func(m map[F]T) bool {
+			return len(m) > 0
+		},
+	)
 }

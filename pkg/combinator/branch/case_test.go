@@ -84,7 +84,7 @@ func TestCase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := Case(tt.args.switchParser, tt.args.caseParsers)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -186,7 +186,7 @@ func TestCaseOrDefault(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := CaseOrDefault(tt.args.switchParser, tt.args.caseParsers, tt.args.defaultParser)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -253,7 +253,7 @@ func TestPeekCase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := PeekCase(tt.args.caseParsers)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)

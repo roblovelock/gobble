@@ -3,95 +3,121 @@ package numeric
 
 import (
 	"encoding/binary"
-	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/parser"
-	"github.com/roblovelock/gobble/pkg/parser/bytes"
+	"io"
 )
+
+type (
+	endianParserConstraint interface {
+		bool | int8 | uint8 | int16 | uint16 | int32 | uint32 | int64 | uint64 | float32 | float64
+	}
+
+	endianParser[T endianParserConstraint] struct {
+		byteOrder binary.ByteOrder
+	}
+)
+
+func (o *endianParser[T]) Parse(in parser.Reader) (result T, err error) {
+	currentOffset, _ := in.Seek(0, io.SeekCurrent)
+	err = binary.Read(in, o.byteOrder, &result)
+	if err == io.ErrUnexpectedEOF {
+		_, _ = in.Seek(currentOffset, io.SeekStart)
+		err = io.EOF
+	}
+	return result, err
+}
 
 // UInt8 returns a 1 byte unsigned integer. io.EOF is returned if the input contains too few bytes
 func UInt8() parser.Parser[parser.Reader, uint8] {
-	return bytes.One()
+	return &endianParser[uint8]{}
 }
 
 // Int8 returns a 1 byte signed integer. io.EOF is returned if the input contains too few bytes
 func Int8() parser.Parser[parser.Reader, int8] {
-	return func(in parser.Reader) (int8, error) {
-		b, err := in.ReadByte()
-		return int8(b), err
-	}
+	return &endianParser[int8]{}
 }
 
-// UInt16BE returns a big endian 2 byte unsigned integer. io.EOF is returned if the input contains too few bytes
-func UInt16BE() parser.Parser[parser.Reader, uint16] {
-	return endian(2, binary.BigEndian.Uint16)
+// Uint16BE returns a big endian 2 byte unsigned integer. io.EOF is returned if the input contains too few bytes
+func Uint16BE() parser.Parser[parser.Reader, uint16] {
+	return &endianParser[uint16]{byteOrder: binary.BigEndian}
 }
 
 // Int16BE returns a big endian 2 byte signed integer. io.EOF is returned if the input contains too few bytes
 func Int16BE() parser.Parser[parser.Reader, int16] {
-	return endian(2, cast[uint16, int16](binary.BigEndian.Uint16))
+	return &endianParser[int16]{byteOrder: binary.BigEndian}
 }
 
-// UInt32BE returns a big endian 4 byte unsigned integer. io.EOF is returned if the input contains too few bytes
-func UInt32BE() parser.Parser[parser.Reader, uint32] {
-	return endian(4, binary.BigEndian.Uint32)
+// Uint32BE returns a big endian 4 byte unsigned integer. io.EOF is returned if the input contains too few bytes
+func Uint32BE() parser.Parser[parser.Reader, uint32] {
+	return &endianParser[uint32]{byteOrder: binary.BigEndian}
 }
 
 // Int32BE returns a big endian 4 byte signed integer. io.EOF is returned if the input contains too few bytes
 func Int32BE() parser.Parser[parser.Reader, int32] {
-	return endian(4, cast[uint32, int32](binary.BigEndian.Uint32))
+	return &endianParser[int32]{byteOrder: binary.BigEndian}
 }
 
-// UInt64BE returns a big endian 8 byte unsigned integer. io.EOF is returned if the input contains too few bytes
-func UInt64BE() parser.Parser[parser.Reader, uint64] {
-	return endian(8, binary.BigEndian.Uint64)
+// Uint64BE returns a big endian 8 byte unsigned integer. io.EOF is returned if the input contains too few bytes
+func Uint64BE() parser.Parser[parser.Reader, uint64] {
+	return &endianParser[uint64]{byteOrder: binary.BigEndian}
 }
 
 // Int64BE returns a big endian 8 byte signed integer. io.EOF is returned if the input contains too few bytes
 func Int64BE() parser.Parser[parser.Reader, int64] {
-	return endian(8, cast[uint64, int64](binary.BigEndian.Uint64))
+	return &endianParser[int64]{byteOrder: binary.BigEndian}
 }
 
-// UInt16LE returns a little endian 2 byte unsigned integer. io.EOF is returned if the input contains too few bytes
-func UInt16LE() parser.Parser[parser.Reader, uint16] {
-	return endian(2, binary.LittleEndian.Uint16)
+// Uint16LE returns a little endian 2 byte unsigned integer. io.EOF is returned if the input contains too few bytes
+func Uint16LE() parser.Parser[parser.Reader, uint16] {
+	return &endianParser[uint16]{byteOrder: binary.LittleEndian}
 }
 
 // Int16LE returns a little endian 2 byte signed integer. io.EOF is returned if the input contains too few bytes
 func Int16LE() parser.Parser[parser.Reader, int16] {
-	return endian(2, cast[uint16, int16](binary.LittleEndian.Uint16))
+	return &endianParser[int16]{byteOrder: binary.LittleEndian}
 }
 
-// UInt32LE returns a little endian 4 byte unsigned integer. io.EOF is returned if the input contains too few bytes
-func UInt32LE() parser.Parser[parser.Reader, uint32] {
-	return endian(4, binary.LittleEndian.Uint32)
+// Uint32LE returns a little endian 4 byte unsigned integer. io.EOF is returned if the input contains too few bytes
+func Uint32LE() parser.Parser[parser.Reader, uint32] {
+	return &endianParser[uint32]{byteOrder: binary.LittleEndian}
 }
 
 // Int32LE returns a little endian 4 byte signed integer. io.EOF is returned if the input contains too few bytes
 func Int32LE() parser.Parser[parser.Reader, int32] {
-	return endian(4, cast[uint32, int32](binary.LittleEndian.Uint32))
+	return &endianParser[int32]{byteOrder: binary.LittleEndian}
 }
 
 // UInt64LE returns a little endian 8 byte unsigned integer. io.EOF is returned if the input contains too few bytes
 func UInt64LE() parser.Parser[parser.Reader, uint64] {
-	return endian(8, binary.LittleEndian.Uint64)
+	return &endianParser[uint64]{byteOrder: binary.LittleEndian}
 }
 
 // Int64LE returns a little endian 8 byte signed integer. io.EOF is returned if the input contains too few bytes
 func Int64LE() parser.Parser[parser.Reader, int64] {
-	return endian(8, cast[uint64, int64](binary.LittleEndian.Uint64))
+	return &endianParser[int64]{byteOrder: binary.LittleEndian}
 }
 
-func cast[U uint16 | uint32 | uint64, S int16 | int32 | int64](f func(b []byte) U) func([]byte) S {
-	return func(b []byte) S {
-		return S(f(b))
-	}
+// Float32BE returns a big endian 4 byte floating point number. io.EOF is returned if the input contains too few bytes
+func Float32BE() parser.Parser[parser.Reader, float32] {
+	return &endianParser[float32]{byteOrder: binary.BigEndian}
 }
 
-func endian[T uint16 | uint32 | uint64 | int16 | int32 | int64](l uint, f func([]byte) T) parser.Parser[parser.Reader, T] {
-	return modifier.Map[parser.Reader, []byte, T](
-		bytes.Take(l),
-		func(bytes []byte) (T, error) {
-			return f(bytes), nil
-		},
-	)
+// Float32LE returns a little endian 4 byte floating point number. io.EOF is returned if the input contains too few bytes
+func Float32LE() parser.Parser[parser.Reader, float32] {
+	return &endianParser[float32]{byteOrder: binary.LittleEndian}
+}
+
+// Float64BE returns a big endian 8 byte floating point number. io.EOF is returned if the input contains too few bytes
+func Float64BE() parser.Parser[parser.Reader, float64] {
+	return &endianParser[float64]{byteOrder: binary.BigEndian}
+}
+
+// Float64LE returns a little endian 8 byte floating point number. io.EOF is returned if the input contains too few bytes
+func Float64LE() parser.Parser[parser.Reader, float64] {
+	return &endianParser[float64]{byteOrder: binary.LittleEndian}
+}
+
+// Bool returns true if the next byte in the input isn't zero. io.EOF is returned if the input contains too few bytes
+func Bool() parser.Parser[parser.Reader, bool] {
+	return &endianParser[bool]{}
 }

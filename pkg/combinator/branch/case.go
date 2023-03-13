@@ -1,37 +1,66 @@
 package branch
 
 import (
+	"github.com/roblovelock/gobble/pkg/combinator"
 	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
+
+type (
+	peekCaseParser[R parser.Reader, T any] struct {
+		parsers map[byte]parser.Parser[R, T]
+	}
+
+	caseParser[R parser.Reader, C comparable, T any] struct {
+		parser        parser.Parser[R, C]
+		parsers       map[C]parser.Parser[R, T]
+		defaultParser parser.Parser[R, T]
+	}
+)
+
+func (o *caseParser[R, C, T]) Parse(in R) (T, error) {
+	currentOffset, _ := in.Seek(0, io.SeekCurrent)
+	c, err := o.parser.Parse(in)
+	if err != nil {
+		var t T
+		return t, err
+	}
+	choice, ok := o.parsers[c]
+	if !ok {
+		choice = o.defaultParser
+	}
+
+	result, err := choice.Parse(in)
+	if err != nil {
+		_, _ = in.Seek(currentOffset, io.SeekStart)
+	}
+
+	return result, err
+}
+
+func (o *peekCaseParser[R, T]) Parse(in R) (T, error) {
+	b, err := in.ReadByte()
+	if err != nil {
+		var t T
+		return t, err
+	}
+	_, _ = in.Seek(-1, io.SeekCurrent)
+	p, ok := o.parsers[b]
+	if !ok {
+		var t T
+		return t, errors.ErrNotMatched
+	}
+
+	return p.Parse(in)
+}
 
 // Case will choose which parser should process the input stream, from the provided map of parsers, based on the result
 // of the initial parser.
 func Case[R parser.Reader, C comparable, T any](
 	p parser.Parser[R, C], parsers map[C]parser.Parser[R, T],
 ) parser.Parser[R, T] {
-	return func(in R) (T, error) {
-		currentOffset, _ := in.Seek(0, io.SeekCurrent)
-		c, err := p(in)
-		if err != nil {
-			var t T
-			return t, err
-		}
-		choice, ok := parsers[c]
-		if !ok {
-			var t T
-			_, _ = in.Seek(currentOffset, io.SeekStart)
-			return t, errors.ErrNotMatched
-		}
-
-		result, err := choice(in)
-		if err != nil {
-			_, _ = in.Seek(currentOffset, io.SeekStart)
-		}
-
-		return result, err
-	}
+	return CaseOrDefault(p, parsers, combinator.Fail[R, T](errors.ErrNotMatched))
 }
 
 // CaseOrDefault will choose which parser should process the input stream, from the provided map of parsers, based on
@@ -39,44 +68,11 @@ func Case[R parser.Reader, C comparable, T any](
 func CaseOrDefault[R parser.Reader, C comparable, T any](
 	p parser.Parser[R, C], parsers map[C]parser.Parser[R, T], d parser.Parser[R, T],
 ) parser.Parser[R, T] {
-	return func(in R) (T, error) {
-		currentOffset, _ := in.Seek(0, io.SeekCurrent)
-		c, err := p(in)
-		if err != nil {
-			var t T
-			return t, err
-		}
-
-		choice, ok := parsers[c]
-		if !ok {
-			choice = d
-		}
-
-		result, err := choice(in)
-		if err != nil {
-			_, _ = in.Seek(currentOffset, io.SeekStart)
-		}
-
-		return result, err
-	}
+	return &caseParser[R, C, T]{parser: p, parsers: parsers, defaultParser: d}
 }
 
 // PeekCase will look ahead one byte and choose which parser should process the input stream, from the provided map of
 // parsers, based on the next byte value.
 func PeekCase[R parser.Reader, T any](parsers map[byte]parser.Parser[R, T]) parser.Parser[R, T] {
-	return func(in R) (T, error) {
-		b, err := in.ReadByte()
-		if err != nil {
-			var t T
-			return t, err
-		}
-		_, _ = in.Seek(-1, io.SeekCurrent)
-		p, ok := parsers[b]
-		if !ok {
-			var t T
-			return t, errors.ErrNotMatched
-		}
-
-		return p(in)
-	}
+	return &peekCaseParser[R, T]{parsers: parsers}
 }

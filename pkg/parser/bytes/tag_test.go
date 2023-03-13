@@ -1,7 +1,6 @@
 package bytes_test
 
 import (
-	"fmt"
 	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
@@ -10,42 +9,6 @@ import (
 	"strings"
 	"testing"
 )
-
-func ExampleTag_match() {
-	input := strings.NewReader("abc")
-	byteParser := bytes.Tag([]byte("ab"))
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: 'ab', Error: <nil>, Remainder: 'c'
-}
-
-func ExampleTag_noMatch() {
-	input := strings.NewReader("abc")
-	byteParser := bytes.Tag([]byte("bc"))
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: '', Error: 'not matched', Remainder: 'abc'
-}
-
-func ExampleTag_endOfFile() {
-	input := strings.NewReader("")
-	byteParser := bytes.Tag([]byte("ab"))
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: '', Error: 'EOF', Remainder: ''
-}
 
 func TestTag(t *testing.T) {
 	type args struct {
@@ -99,7 +62,7 @@ func TestTag(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.Tag(tt.args.bytes)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)

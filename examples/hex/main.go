@@ -40,5 +40,5 @@ func hexByteToUint8(hexByte byte) (uint8, error) {
 }
 
 func Parse(in string) (color.Color, error) {
-	return colorParser(strings.NewReader(in))
+	return colorParser.Parse(strings.NewReader(in))
 }

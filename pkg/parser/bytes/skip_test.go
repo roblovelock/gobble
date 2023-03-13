@@ -69,7 +69,7 @@ func TestSkip(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.Skip(tt.args.predicate)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Nil(t, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -117,7 +117,7 @@ func TestSkip0(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.SkipWhile(tt.args.predicate)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Nil(t, s)
 			assert.NoError(t, err)
@@ -167,7 +167,7 @@ func TestSkip1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.SkipWhile1(tt.args.predicate)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Nil(t, s)
 			assert.ErrorIs(t, err, tt.wantErr)

@@ -54,7 +54,7 @@ func TestMany0(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := Many0(tt.args.p)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -111,7 +111,7 @@ func TestMany1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := Many1(tt.args.p)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -168,7 +168,7 @@ func TestMany0Count(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := Many0Count(tt.args.p)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -225,7 +225,7 @@ func TestMany1Count(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := Many1Count(tt.args.p)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)

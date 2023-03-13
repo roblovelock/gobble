@@ -1,7 +1,6 @@
 package bytes_test
 
 import (
-	"fmt"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
 	"github.com/stretchr/testify/assert"
@@ -10,42 +9,6 @@ import (
 	"strings"
 	"testing"
 )
-
-func ExampleTake_match() {
-	input := strings.NewReader("abc")
-	byteParser := bytes.Take(2)
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: 'ab', Error: <nil>, Remainder: 'c'
-}
-
-func ExampleTake_unexpectedEndOfFile() {
-	input := strings.NewReader("abc")
-	byteParser := bytes.Take(4)
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: '', Error: 'EOF', Remainder: 'abc'
-}
-
-func ExampleTake_endOfFile() {
-	input := strings.NewReader("")
-	byteParser := bytes.Take(4)
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: '', Error: 'EOF', Remainder: ''
-}
 
 func TestTake(t *testing.T) {
 	type args struct {
@@ -86,7 +49,7 @@ func TestTake(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.Take(tt.args.take)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)

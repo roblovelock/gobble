@@ -158,22 +158,3 @@ func (r *bitReader) ReadBits(n uint8) (uint64, uint8, error) {
 func (r *bitReader) isAligned() bool {
 	return r.bits == 0
 }
-
-func Bits[T any](p parser.Parser[parser.BitReader, T]) parser.Parser[parser.Reader, T] {
-	return func(in parser.Reader) (T, error) {
-		currentOffset, _ := in.Seek(0, io.SeekCurrent)
-		reader := &bitReader{Reader: in}
-		result, err := p(reader)
-		if err != nil {
-			var t T
-			return t, err
-		}
-
-		if !reader.isAligned() {
-			_, _ = in.Seek(currentOffset, io.SeekStart)
-			return result, ErrRemainingBits
-		}
-
-		return result, nil
-	}
-}

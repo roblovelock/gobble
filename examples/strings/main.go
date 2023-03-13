@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/roblovelock/gobble/pkg/combinator"
 	"github.com/roblovelock/gobble/pkg/combinator/branch"
 	"github.com/roblovelock/gobble/pkg/combinator/modifier"
@@ -16,26 +15,12 @@ import (
 	"unicode"
 )
 
-func main() {
-	data := "\"abc\""
-	fmt.Printf("EXAMPLE 1:\nParsing a simple input string:\n\n%s", data)
-
-	result, _ := parseString(strings.NewReader(data))
-	fmt.Printf(" => %s\n\n", result)
-
-	data = "\"tab:\\tafter tab, newline:\\nnew line, quote: \\\", emoji: \\u{1F602}, newline:\\nescaped whitespace: \\    abc\""
-	fmt.Printf("EXAMPLE 2:\nParsing a string with escape sequences, newline literal, and escaped whitespace:\n\n%s", data)
-
-	result, _ = parseString(strings.NewReader(data))
-	fmt.Printf(" => %s\n\n", result)
-}
-
-func parseEscapedChar() parser.Parser[parser.Reader, string] {
+func escapedCharParser() parser.Parser[parser.Reader, string] {
 	return modifier.Map(
 		sequence.Preceded(
 			bytes.Byte('\\'),
 			branch.Alt(
-				parseUnicode(),
+				unicodeParser(),
 				modifier.Value(bytes.Byte('n'), '\n'),
 				modifier.Value(bytes.Byte('r'), '\r'),
 				modifier.Value(bytes.Byte('t'), '\t'),
@@ -50,7 +35,7 @@ func parseEscapedChar() parser.Parser[parser.Reader, string] {
 	)
 }
 
-func parseUnicode() parser.Parser[parser.Reader, rune] {
+func unicodeParser() parser.Parser[parser.Reader, rune] {
 	return modifier.Map(
 		sequence.Preceded(
 			bytes.Byte('u'),
@@ -67,14 +52,14 @@ func parseUnicode() parser.Parser[parser.Reader, rune] {
 	)
 }
 
-func parseEscapedWhitespace() parser.Parser[parser.Reader, string] {
+func escapedWhitespaceParser() parser.Parser[parser.Reader, string] {
 	return sequence.Preceded(
 		sequence.Preceded(bytes.Byte('\\'), ascii.Whitespace1()),
 		combinator.Success[parser.Reader](""),
 	)
 }
 
-func parseLiteral() parser.Parser[parser.Reader, string] {
+func literalParser() parser.Parser[parser.Reader, string] {
 	return modifier.Verify(runes.TakeWhile(isNot('"', '\\')), func(v string) bool { return len(v) > 0 })
 }
 
@@ -89,19 +74,19 @@ func isNot(runes ...rune) parser.Predicate[rune] {
 	}
 }
 
-func parseFragment() parser.Parser[parser.Reader, string] {
+func fragmentParser() parser.Parser[parser.Reader, string] {
 	return branch.Alt(
-		parseLiteral(),
-		parseEscapedChar(),
-		parseEscapedWhitespace(),
+		literalParser(),
+		escapedCharParser(),
+		escapedWhitespaceParser(),
 	)
 }
 
-func parseString(in parser.Reader) (string, error) {
+func stringParser() parser.Parser[parser.Reader, string] {
 	return modifier.Map(sequence.Delimited(
 		bytes.Byte('"'),
 		multi.FoldMany0(
-			parseFragment(),
+			fragmentParser(),
 			strings.Builder{},
 			func(builder strings.Builder, v string) strings.Builder {
 				builder.WriteString(v)
@@ -110,5 +95,9 @@ func parseString(in parser.Reader) (string, error) {
 		bytes.Byte('"'),
 	), func(builder strings.Builder) (string, error) {
 		return builder.String(), nil
-	})(in)
+	})
+}
+
+func parseString(in parser.Reader) (string, error) {
+	return stringParser().Parse(in)
 }

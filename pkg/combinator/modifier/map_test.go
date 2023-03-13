@@ -82,7 +82,7 @@ func TestMap(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := modifier.Map(tt.args.parser, tt.args.mapFunc)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			if tt.wantErr != nil {

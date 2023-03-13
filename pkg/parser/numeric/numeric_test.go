@@ -2,7 +2,6 @@ package numeric_test
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/numeric"
 	"github.com/stretchr/testify/assert"
@@ -10,30 +9,6 @@ import (
 	"io"
 	"testing"
 )
-
-func ExampleUInt8_match() {
-	input := bytes.NewReader([]byte{1, 2, 3})
-	numericParser := numeric.UInt8()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [2 3]
-}
-
-func ExampleUInt8_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.UInt8()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
-}
 
 func TestUInt8(t *testing.T) {
 	type args struct {
@@ -61,7 +36,7 @@ func TestUInt8(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.UInt8()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -71,30 +46,6 @@ func TestUInt8(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleInt8_match() {
-	input := bytes.NewReader([]byte{1, 2, 3})
-	numericParser := numeric.Int8()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [2 3]
-}
-
-func ExampleInt8_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.Int8()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestInt8(t *testing.T) {
@@ -129,7 +80,7 @@ func TestInt8(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.Int8()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -139,30 +90,6 @@ func TestInt8(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleUInt16LE_match() {
-	input := bytes.NewReader([]byte{0x01, 0x00, 3})
-	numericParser := numeric.UInt16LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleUInt16LE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.UInt16LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestUInt16LE(t *testing.T) {
@@ -190,8 +117,8 @@ func TestUInt16LE(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := numeric.UInt16LE()
-			s, err := p(tt.args.input)
+			p := numeric.Uint16LE()
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -201,30 +128,6 @@ func TestUInt16LE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleInt16LE_match() {
-	input := bytes.NewReader([]byte{0x01, 0x00, 3})
-	numericParser := numeric.Int16LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleInt16LE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.Int16LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestInt16LE(t *testing.T) {
@@ -266,7 +169,7 @@ func TestInt16LE(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.Int16LE()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -276,30 +179,6 @@ func TestInt16LE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleUInt16BE_match() {
-	input := bytes.NewReader([]byte{0x00, 0x01, 3})
-	numericParser := numeric.UInt16BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleUInt16BE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.UInt16BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestUInt16BE(t *testing.T) {
@@ -327,8 +206,8 @@ func TestUInt16BE(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := numeric.UInt16BE()
-			s, err := p(tt.args.input)
+			p := numeric.Uint16BE()
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -338,30 +217,6 @@ func TestUInt16BE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleInt16BE_match() {
-	input := bytes.NewReader([]byte{0x00, 0x01, 3})
-	numericParser := numeric.Int16BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleInt16BE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.Int16BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestInt16BE(t *testing.T) {
@@ -403,7 +258,7 @@ func TestInt16BE(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.Int16BE()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -413,30 +268,6 @@ func TestInt16BE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleUInt32LE_match() {
-	input := bytes.NewReader([]byte{0x01, 0x00, 0x00, 0x00, 3})
-	numericParser := numeric.UInt32LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleUInt32LE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.UInt32LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestUInt32LE(t *testing.T) {
@@ -464,8 +295,8 @@ func TestUInt32LE(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := numeric.UInt32LE()
-			s, err := p(tt.args.input)
+			p := numeric.Uint32LE()
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -475,30 +306,6 @@ func TestUInt32LE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleInt32LE_match() {
-	input := bytes.NewReader([]byte{0x01, 0x00, 0x00, 0x00, 3})
-	numericParser := numeric.Int32LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleInt32LE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.Int32LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestInt32LE(t *testing.T) {
@@ -540,7 +347,7 @@ func TestInt32LE(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.Int32LE()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -550,30 +357,6 @@ func TestInt32LE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleUInt32BE_match() {
-	input := bytes.NewReader([]byte{0x00, 0x00, 0x00, 0x01, 3})
-	numericParser := numeric.UInt32BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleUInt32BE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.UInt32BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestUInt32BE(t *testing.T) {
@@ -601,8 +384,8 @@ func TestUInt32BE(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := numeric.UInt32BE()
-			s, err := p(tt.args.input)
+			p := numeric.Uint32BE()
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -612,30 +395,6 @@ func TestUInt32BE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleInt32BE_match() {
-	input := bytes.NewReader([]byte{0x00, 0x00, 0x00, 0x01, 3})
-	numericParser := numeric.Int32BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleInt32BE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.Int32BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestInt32BE(t *testing.T) {
@@ -677,7 +436,7 @@ func TestInt32BE(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.Int32BE()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -687,30 +446,6 @@ func TestInt32BE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleUInt64LE_match() {
-	input := bytes.NewReader([]byte{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 3})
-	numericParser := numeric.UInt64LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleUInt64LE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.UInt64LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestUInt64LE(t *testing.T) {
@@ -739,7 +474,7 @@ func TestUInt64LE(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.UInt64LE()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -749,30 +484,6 @@ func TestUInt64LE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleInt64LE_match() {
-	input := bytes.NewReader([]byte{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 3})
-	numericParser := numeric.Int64LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleInt64LE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.Int64LE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestInt64LE(t *testing.T) {
@@ -814,7 +525,7 @@ func TestInt64LE(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.Int64LE()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -824,30 +535,6 @@ func TestInt64LE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleUInt64BE_match() {
-	input := bytes.NewReader([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 3})
-	numericParser := numeric.UInt64BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleUInt64BE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.UInt64BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestUInt64BE(t *testing.T) {
@@ -875,8 +562,8 @@ func TestUInt64BE(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := numeric.UInt64BE()
-			s, err := p(tt.args.input)
+			p := numeric.Uint64BE()
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -886,30 +573,6 @@ func TestUInt64BE(t *testing.T) {
 			assert.Equal(t, tt.wantRemain, remain)
 		})
 	}
-}
-
-func ExampleInt64BE_match() {
-	input := bytes.NewReader([]byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 3})
-	numericParser := numeric.Int64BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: %v, Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 1, Error: <nil>, Remainder: [3]
-}
-
-func ExampleInt64BE_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := numeric.Int64BE()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
 }
 
 func TestInt64BE(t *testing.T) {
@@ -951,7 +614,7 @@ func TestInt64BE(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := numeric.Int64BE()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)

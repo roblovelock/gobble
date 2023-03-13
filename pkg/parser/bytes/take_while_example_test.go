@@ -12,7 +12,7 @@ func ExampleTakeWhileMinMax_match() {
 	input := strings.NewReader("abc")
 	byteParser := bytes.TakeWhileMinMax(1, 2, ascii.IsLetter)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 
@@ -24,7 +24,7 @@ func ExampleTakeWhileMinMax_noMatch() {
 	input := strings.NewReader("abc")
 	byteParser := bytes.TakeWhileMinMax(1, 2, ascii.IsDigit)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
 
@@ -36,7 +36,7 @@ func ExampleTakeWhileMinMax_endOfFile() {
 	input := strings.NewReader("")
 	byteParser := bytes.TakeWhileMinMax(1, 2, ascii.IsDigit)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
 
@@ -48,7 +48,7 @@ func ExampleTakeWhile1_match() {
 	input := strings.NewReader("abc123")
 	byteParser := bytes.TakeWhile1(ascii.IsLetter)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 
@@ -60,7 +60,7 @@ func ExampleTakeWhile1_noMatch() {
 	input := strings.NewReader("abc")
 	byteParser := bytes.TakeWhile1(ascii.IsDigit)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
 
@@ -72,7 +72,7 @@ func ExampleTakeWhile1_endOfFile() {
 	input := strings.NewReader("")
 	byteParser := bytes.TakeWhile1(ascii.IsDigit)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
 
@@ -84,7 +84,7 @@ func ExampleTakeWhile_match() {
 	input := strings.NewReader("abc123")
 	byteParser := bytes.TakeWhile(ascii.IsLetter)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 
@@ -96,7 +96,7 @@ func ExampleTakeWhile_noMatch() {
 	input := strings.NewReader("abc")
 	byteParser := bytes.TakeWhile(ascii.IsDigit)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 
@@ -108,7 +108,7 @@ func ExampleTakeWhile_endOfFile() {
 	input := strings.NewReader("")
 	byteParser := bytes.TakeWhile(ascii.IsDigit)
 
-	match, err := byteParser(input)
+	match, err := byteParser.Parse(input)
 	remainder, _ := io.ReadAll(input)
 	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
 

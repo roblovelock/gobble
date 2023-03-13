@@ -1,7 +1,6 @@
 package bytes_test
 
 import (
-	"fmt"
 	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/bytes"
@@ -11,42 +10,6 @@ import (
 	"strings"
 	"testing"
 )
-
-func ExampleOneOf_match() {
-	input := strings.NewReader("abc123")
-	byteParser := bytes.OneOf('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: 'a', Error: <nil>, Remainder: 'bc123'
-}
-
-func ExampleOneOf_noMatch() {
-	input := strings.NewReader("123")
-	byteParser := bytes.OneOf('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: '%s'", match, err, string(remainder))
-
-	// Output:
-	// Match: 0, Error: 'not matched', Remainder: '123'
-}
-
-func ExampleOneOf_endOfFile() {
-	input := strings.NewReader("")
-	byteParser := bytes.OneOf('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: '%s'", match, err, string(remainder))
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: ''
-}
 
 func TestOneOf(t *testing.T) {
 	type args struct {
@@ -99,7 +62,7 @@ func TestOneOf(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.OneOf(tt.args.bytes...)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -111,42 +74,6 @@ func TestOneOf(t *testing.T) {
 			}
 		})
 	}
-}
-
-func ExampleOneOf1_match() {
-	input := strings.NewReader("abc123")
-	byteParser := bytes.OneOf1('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: 'abc', Error: <nil>, Remainder: '123'
-}
-
-func ExampleOneOf1_noMatch() {
-	input := strings.NewReader("123")
-	byteParser := bytes.OneOf1('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: '', Error: 'not matched', Remainder: '123'
-}
-
-func ExampleOneOf1_endOfFile() {
-	input := strings.NewReader("")
-	byteParser := bytes.OneOf1('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: '%v', Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: '', Error: 'EOF', Remainder: ''
 }
 
 func TestOneOf1(t *testing.T) {
@@ -212,7 +139,7 @@ func TestOneOf1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.OneOf1(tt.args.bytes...)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -224,42 +151,6 @@ func TestOneOf1(t *testing.T) {
 			}
 		})
 	}
-}
-
-func ExampleOneOf0_match() {
-	input := strings.NewReader("abc123")
-	byteParser := bytes.OneOf0('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: 'abc', Error: <nil>, Remainder: '123'
-}
-
-func ExampleOneOf0_noMatch() {
-	input := strings.NewReader("123")
-	byteParser := bytes.OneOf0('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: '', Error: <nil>, Remainder: '123'
-}
-
-func ExampleOneOf0_endOfFile() {
-	input := strings.NewReader("")
-	byteParser := bytes.OneOf0('a', 'b', 'c')
-
-	match, err := byteParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, string(remainder))
-
-	// Output:
-	// Match: '', Error: <nil>, Remainder: ''
 }
 
 func TestOneOf0(t *testing.T) {
@@ -325,7 +216,7 @@ func TestOneOf0(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := bytes.OneOf0(tt.args.bytes...)
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.NoError(t, err)

@@ -62,7 +62,7 @@ func TestBlankSpace(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.BlankSpace()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -107,7 +107,7 @@ func TestBlankSpace0(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.BlankSpace0()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.NoError(t, err)
@@ -153,7 +153,7 @@ func TestBlankSpace1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.BlankSpace1()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -212,7 +212,7 @@ func TestSkipBlankSpace(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.SkipBlankSpace()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Nil(t, s)
 			assert.ErrorIs(t, err, tt.wantErr)
@@ -259,7 +259,7 @@ func TestSkipBlankSpace0(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.SkipBlankSpace0()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Nil(t, s)
 			assert.NoError(t, err)
@@ -308,7 +308,7 @@ func TestSkipBlankSpace1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := ascii.SkipBlankSpace1()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Nil(t, s)
 			assert.ErrorIs(t, err, tt.wantErr)

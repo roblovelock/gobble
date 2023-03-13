@@ -49,7 +49,7 @@ func TestOffset(t *testing.T) {
 			for i := 0; i < tt.args.readBytes; i++ {
 				_, _ = tt.args.input.ReadByte()
 			}
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.want, s)
 			assert.NoError(t, err)

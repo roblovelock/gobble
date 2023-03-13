@@ -17,7 +17,9 @@ type (
 		ReadBool() (bool, error)
 	}
 
-	Parser[R Reader, T any] func(in R) (T, error)
+	Parser[R Reader, T any] interface {
+		Parse(in R) (T, error)
+	}
 
 	Empty                 *struct{}
 	Predicate[T any]      func(T) bool
@@ -27,9 +29,3 @@ type (
 		Second B
 	}
 )
-
-func Pointer[R Reader, T any](p *Parser[R, T]) Parser[R, T] {
-	return func(in R) (T, error) {
-		return (*p)(in)
-	}
-}

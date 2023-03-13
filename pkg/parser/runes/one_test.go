@@ -2,7 +2,6 @@ package runes_test
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"github.com/roblovelock/gobble/pkg/parser/runes"
 	"github.com/stretchr/testify/assert"
@@ -11,30 +10,6 @@ import (
 	"strings"
 	"testing"
 )
-
-func ExampleOne_match() {
-	input := strings.NewReader("𒀀𒀀")
-	numericParser := runes.One()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: '%s', Error: %v, Remainder: '%s'", string(match), err, remainder)
-
-	// Output:
-	// Match: '𒀀', Error: <nil>, Remainder: '𒀀'
-}
-
-func ExampleOne_endOfFile() {
-	input := bytes.NewReader([]byte{})
-	numericParser := runes.One()
-
-	match, err := numericParser(input)
-	remainder, _ := io.ReadAll(input)
-	fmt.Printf("Match: %d, Error: '%v', Remainder: %v", match, err, remainder)
-
-	// Output:
-	// Match: 0, Error: 'EOF', Remainder: []
-}
 
 func TestOne(t *testing.T) {
 	type args struct {
@@ -62,7 +37,7 @@ func TestOne(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := runes.One()
-			s, err := p(tt.args.input)
+			s, err := p.Parse(tt.args.input)
 
 			assert.Equal(t, tt.wantMatch, s)
 			assert.ErrorIs(t, err, tt.wantErr)

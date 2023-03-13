@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func TestParseExpr(t *testing.T) {
 	type args struct {
@@ -10,7 +13,7 @@ func TestParseExpr(t *testing.T) {
 		name    string
 		args    args
 		want    int64
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name: "test add",
@@ -41,13 +44,8 @@ func TestParseExpr(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := ParseExpr(tt.args.expr)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ParseExpr() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("ParseExpr() got = %v, want %v", got, tt.want)
-			}
+			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }

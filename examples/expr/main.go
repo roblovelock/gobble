@@ -24,8 +24,8 @@ import (
 )
 
 var (
-	openParan  = sequence.Terminated(bytes.Byte('('), multi.Many0(ascii.Whitespace()))
-	closeParan = sequence.Preceded(multi.Many0(ascii.Whitespace()), bytes.Byte(')'))
+	openParen  = sequence.Terminated(bytes.Byte('('), ascii.SkipWhitespace0())
+	closeParen = sequence.Preceded(ascii.SkipWhitespace0(), bytes.Byte(')'))
 	add        = bytes.Byte('+')
 	subtract   = bytes.Byte('-')
 	multiply   = bytes.Byte('*')
@@ -51,9 +51,9 @@ func init() {
 
 	// num | "(" expr ")"
 	value := sequence.Delimited(
-		multi.Many0(ascii.Whitespace()),
-		branch.Alt(ascii.Int64(), sequence.Delimited(openParan, parser.Pointer(&sum), closeParan)),
-		multi.Many0(ascii.Whitespace()),
+		ascii.SkipWhitespace0(),
+		branch.Alt(ascii.Int64(), sequence.Delimited(openParen, parser.Pointer(&sum), closeParen)),
+		ascii.SkipWhitespace0(),
 	)
 
 	// (mulop value)*
@@ -93,5 +93,5 @@ func init() {
 
 func ParseExpr(expr string) (int64, error) {
 	reader := strings.NewReader(expr)
-	return sum(reader)
+	return sum.Parse(reader)
 }

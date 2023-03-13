@@ -1,78 +1,51 @@
 package multi
 
 import (
+	"github.com/roblovelock/gobble/pkg/combinator/modifier"
 	"github.com/roblovelock/gobble/pkg/parser"
 )
+
+type (
+	separated0Parser[R parser.Reader, T any, S any] struct {
+		parser    parser.Parser[R, T]
+		separator parser.Parser[R, S]
+	}
+)
+
+func (o *separated0Parser[R, T, S]) Parse(in R) ([]T, error) {
+	result := make([]T, 0)
+	for r, err := o.parser.Parse(in); err == nil; r, err = o.parser.Parse(in) {
+		result = append(result, r)
+		if _, err := o.separator.Parse(in); err != nil {
+			break
+		}
+	}
+
+	return result, nil
+}
 
 func Separated0[R parser.Reader, T any, S any](
 	p parser.Parser[R, T], separator parser.Parser[R, S],
 ) parser.Parser[R, []T] {
-	return func(in R) ([]T, error) {
-		result := make([]T, 0)
-		for r, err := p(in); err == nil; r, err = p(in) {
-			result = append(result, r)
-			if _, err := separator(in); err != nil {
-				break
-			}
-		}
-
-		return result, nil
-	}
+	return &separated0Parser[R, T, S]{parser: p, separator: separator}
 }
 
 func Separated0Count[R parser.Reader, T any, S any](
 	p parser.Parser[R, T], separator parser.Parser[R, S],
-) parser.Parser[R, uint] {
-	return func(in R) (uint, error) {
-		var count uint = 0
-		for _, err := p(in); err == nil; _, err = p(in) {
-			count++
-			if _, err := separator(in); err != nil {
-				break
-			}
-		}
-
-		return count, nil
-	}
+) parser.Parser[R, int] {
+	return modifier.Count[R, T, []T](Separated0(p, separator))
 }
 
 func Separated1[R parser.Reader, T any, S any](
 	p parser.Parser[R, T], separator parser.Parser[R, S],
 ) parser.Parser[R, []T] {
-	return func(in R) ([]T, error) {
-		r, err := p(in)
-		if err != nil {
-			return nil, err
-		}
-
-		result := []T{r}
-		for r, err := p(in); err == nil; r, err = p(in) {
-			result = append(result, r)
-			if _, err := separator(in); err != nil {
-				break
-			}
-		}
-
-		return result, nil
-	}
+	return modifier.Verify(Separated0(p, separator), func(ts []T) bool {
+		return len(ts) > 0
+	})
 }
 
 func Separated1Count[R parser.Reader, T any, S any](
 	p parser.Parser[R, T], separator parser.Parser[R, S],
-) parser.Parser[R, uint] {
-	return func(in R) (uint, error) {
-		if _, err := p(in); err != nil {
-			return 0, err
-		}
-
-		var count uint = 1
-		for _, err := p(in); err == nil; _, err = p(in) {
-			count++
-			if _, err := separator(in); err != nil {
-				break
-			}
-		}
-
-		return count, nil
-	}
+) parser.Parser[R, int] {
+	return modifier.Count[R, T, []T](Separated1(p, separator))
 }
