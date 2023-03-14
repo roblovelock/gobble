@@ -95,3 +95,7 @@ func ParseExpr(expr string) (int64, error) {
 	reader := strings.NewReader(expr)
 	return sum.Parse(reader)
 }
+
+func ParseBytesExpr(expr string) (int64, []byte, error) {
+	return sum.ParseBytes([]byte(expr))
+}

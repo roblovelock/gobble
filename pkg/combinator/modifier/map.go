@@ -6,11 +6,9 @@ import (
 )
 
 type (
-	MapFunc[T, V any] func(T) (V, error)
-
 	mapParser[R parser.Reader, T, V any] struct {
 		parser parser.Parser[R, T]
-		fn     MapFunc[T, V]
+		fn     parser.MapFunc[T, V]
 	}
 )
 
@@ -28,7 +26,20 @@ func (o *mapParser[R, T, V]) Parse(in R) (V, error) {
 	return r, err
 }
 
+func (o *mapParser[R, T, V]) ParseBytes(in []byte) (V, []byte, error) {
+	t, out, err := o.parser.ParseBytes(in)
+	if err != nil {
+		var v V
+		return v, in, err
+	}
+	r, err := o.fn(t)
+	if err != nil {
+		return r, in, err
+	}
+	return r, out, err
+}
+
 // Map passes the output from the parser to the map function, before returning the mapped result.
-func Map[R parser.Reader, T, V any](p parser.Parser[R, T], mapFunc MapFunc[T, V]) parser.Parser[R, V] {
+func Map[R parser.Reader, T, V any](p parser.Parser[R, T], mapFunc parser.MapFunc[T, V]) parser.Parser[R, V] {
 	return &mapParser[R, T, V]{parser: p, fn: mapFunc}
 }

@@ -30,6 +30,17 @@ func (o *digitParser) Parse(in parser.Reader) (byte, error) {
 	return 0, errors.ErrNotMatched
 }
 
+func (o *digitParser) ParseBytes(in []byte) (byte, []byte, error) {
+	if len(in) == 0 {
+		return 0, in, io.EOF
+	}
+
+	if IsDigit(in[0]) {
+		return in[0], in[1:], nil
+	}
+	return 0, in, errors.ErrNotMatched
+}
+
 func (o *digit0Parser) Parse(in parser.Reader) ([]byte, error) {
 	digits := make([]byte, 0)
 
@@ -43,6 +54,15 @@ func (o *digit0Parser) Parse(in parser.Reader) ([]byte, error) {
 		}
 		digits = append(digits, b)
 	}
+}
+
+func (o *digit0Parser) ParseBytes(in []byte) ([]byte, []byte, error) {
+	for i := 0; i < len(in); i++ {
+		if !IsDigit(in[i]) {
+			return in[0:i], in[i:], nil
+		}
+	}
+	return nil, in, nil
 }
 
 func (o *digit1Parser) Parse(in parser.Reader) ([]byte, error) {
@@ -71,6 +91,19 @@ func (o *digit1Parser) Parse(in parser.Reader) ([]byte, error) {
 	}
 }
 
+func (o *digit1Parser) ParseBytes(in []byte) ([]byte, []byte, error) {
+	i := 0
+	for ; i < len(in); i++ {
+		if !IsDigit(in[i]) {
+			break
+		}
+	}
+	if i == 0 {
+		return nil, in, errors.ErrNotMatched
+	}
+	return in[0:i], in[i:], nil
+}
+
 var digitParserInstance = &digitParser{}
 var digit0ParserInstance = &digit0Parser{}
 var digit1ParserInstance = &digit1Parser{}
@@ -78,7 +111,7 @@ var digit1ParserInstance = &digit1Parser{}
 // Digit matches a single ASCII numerical character: 0-9
 //   - If the input matches a numerical character, it will return the match.
 //   - If the input is empty, it will return io.EOF
-//   - If the input doesn't match a numerical character, it will return parser.ErrNotMatched
+//   - If the input doesn't match a numerical character, it will return errors.ErrNotMatched
 func Digit() parser.Parser[parser.Reader, byte] {
 	return digitParserInstance
 }
@@ -94,7 +127,7 @@ func Digit0() parser.Parser[parser.Reader, []byte] {
 // Digit1 matches one or more ASCII numerical characters: 0-9
 //   - If the input matches a numerical character, it will return a slice of all matched digits.
 //   - If the input is empty, it will return io.EOF.
-//   - If the input doesn't match a numerical character, it will return parser.ErrNotMatched.
+//   - If the input doesn't match a numerical character, it will return errors.ErrNotMatched.
 func Digit1() parser.Parser[parser.Reader, []byte] {
 	return digit1ParserInstance
 }

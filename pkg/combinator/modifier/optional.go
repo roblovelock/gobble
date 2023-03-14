@@ -1,6 +1,8 @@
 package modifier
 
-import "github.com/roblovelock/gobble/pkg/parser"
+import (
+	"github.com/roblovelock/gobble/pkg/parser"
+)
 
 type (
 	optionalParser[R parser.Reader, T any] struct {
@@ -11,6 +13,11 @@ type (
 func (o *optionalParser[R, T]) Parse(in R) (T, error) {
 	v, _ := o.parser.Parse(in)
 	return v, nil
+}
+
+func (o *optionalParser[R, T]) ParseBytes(in []byte) (T, []byte, error) {
+	v, out, _ := o.parser.ParseBytes(in)
+	return v, out, nil
 }
 
 // Optional will call the parser and suppress any error returned

@@ -64,6 +64,30 @@ func (d *parserDebug[R, T]) Parse(in R) (T, error) {
 	return call.result, call.err
 }
 
+func (d *parserDebug[R, T]) ParseBytes(in []byte) (T, []byte, error) {
+	var out []byte
+	call := callDebug[R, T]{
+		parserDebug: d,
+	}
+	d.callCount++
+	call.startOffset = 0
+	startTime := time.Unix(0, time.Now().UnixNano())
+	call.result, out, call.err = d.parser.ParseBytes(in)
+	call.callTime = time.Since(startTime)
+	call.endOffset = int64(len(in) - len(out))
+	d.totalTime += call.callTime
+	call.bytesConsumed = call.endOffset - call.startOffset
+	d.totalBytesConsumed += call.bytesConsumed
+	if call.err != nil {
+		d.errorCount++
+	} else {
+		d.successCount++
+	}
+
+	fmt.Printf("%s\n", call.String())
+	return call.result, out, call.err
+}
+
 func Debug[R Reader, T any](p Parser[R, T]) Parser[R, T] {
 	return &parserDebug[R, T]{parser: p}
 }

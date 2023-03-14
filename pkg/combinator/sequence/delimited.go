@@ -35,6 +35,26 @@ func (o *delimitedParser[R, F, S, T]) Parse(in R) (S, error) {
 	return s, nil
 }
 
+func (o *delimitedParser[R, F, S, T]) ParseBytes(in []byte) (S, []byte, error) {
+	_, out, err := o.first.ParseBytes(in)
+	if err != nil {
+		var r S
+		return r, in, err
+	}
+
+	s, out, err := o.second.ParseBytes(out)
+	if err != nil {
+		return s, in, err
+	}
+	_, out, err = o.third.ParseBytes(out)
+	if err != nil {
+		var r S
+		return r, in, err
+	}
+
+	return s, out, nil
+}
+
 // Delimited Matches an object from the first parser and discards it, then gets an object from the second parser,
 // and finally matches an object from the third parser and discards it.
 func Delimited[R parser.Reader, F, S, T any](

@@ -19,6 +19,14 @@ func (o *cutParser[R, T]) Parse(in R) (T, error) {
 	return r, err
 }
 
+func (o *cutParser[R, T]) ParseBytes(in []byte) (T, []byte, error) {
+	t, out, err := o.parser.ParseBytes(in)
+	if err != nil {
+		return t, in, errors.NewFatalError(err)
+	}
+	return t, out, nil
+}
+
 func Cut[R parser.Reader, T any](p parser.Parser[R, T]) parser.Parser[R, T] {
 	return &cutParser[R, T]{parser: p}
 }

@@ -39,6 +39,25 @@ func (o *caseParser[R, C, T]) Parse(in R) (T, error) {
 	return result, err
 }
 
+func (o *caseParser[R, C, T]) ParseBytes(in []byte) (T, []byte, error) {
+	c, out, err := o.parser.ParseBytes(in)
+	if err != nil {
+		var t T
+		return t, in, err
+	}
+	choice, ok := o.parsers[c]
+	if !ok {
+		choice = o.defaultParser
+	}
+
+	result, out, err := choice.ParseBytes(out)
+	if err != nil {
+		return result, in, err
+	}
+
+	return result, out, nil
+}
+
 func (o *peekCaseParser[R, T]) Parse(in R) (T, error) {
 	b, err := in.ReadByte()
 	if err != nil {
@@ -53,6 +72,20 @@ func (o *peekCaseParser[R, T]) Parse(in R) (T, error) {
 	}
 
 	return p.Parse(in)
+}
+
+func (o *peekCaseParser[R, T]) ParseBytes(in []byte) (T, []byte, error) {
+	if len(in) == 0 {
+		var t T
+		return t, in, io.EOF
+	}
+	p, ok := o.parsers[in[0]]
+	if !ok {
+		var t T
+		return t, in, errors.ErrNotMatched
+	}
+
+	return p.ParseBytes(in)
 }
 
 // Case will choose which parser should process the input stream, from the provided map of parsers, based on the result

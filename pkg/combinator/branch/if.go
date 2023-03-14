@@ -28,6 +28,19 @@ func (o *ifParser[R, C, T]) Parse(in R) (result T, err error) {
 	return
 }
 
+func (o *ifParser[R, C, T]) ParseBytes(in []byte) (result T, out []byte, err error) {
+	if _, out, err = o.condition.ParseBytes(in); err != nil {
+		result, out, err = o.err.ParseBytes(in)
+	} else {
+		result, out, err = o.success.ParseBytes(in)
+	}
+
+	if err != nil {
+		out = in
+	}
+	return
+}
+
 // If runs the conditional parser and chooses whether to run the success or error parser based on the outcome.
 func If[R parser.Reader, C, T any](
 	condition parser.Parser[R, C], success parser.Parser[R, T], err parser.Parser[R, T],

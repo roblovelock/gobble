@@ -19,10 +19,12 @@ type (
 
 	Parser[R Reader, T any] interface {
 		Parse(in R) (T, error)
+		ParseBytes(in []byte) (T, []byte, error)
 	}
 
 	Empty                 *struct{}
 	Predicate[T any]      func(T) bool
+	MapFunc[T, V any]     func(T) (V, error)
 	Accumulator[T, R any] func(R, T) R
 	Pair[A, B any]        struct {
 		First  A

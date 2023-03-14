@@ -2,6 +2,7 @@ package bits
 
 import (
 	"github.com/roblovelock/gobble/pkg/combinator"
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 	"math/bits"
@@ -27,6 +28,10 @@ func (o *takeParser[T]) Parse(in parser.BitReader) (T, error) {
 	}
 
 	return T(b), nil
+}
+
+func (*takeParser[T]) ParseBytes(in []byte) (T, []byte, error) {
+	return 0, in, errors.ErrNotSupported
 }
 
 func Take[T takeParserConstraint](n uint8) parser.Parser[parser.BitReader, T] {

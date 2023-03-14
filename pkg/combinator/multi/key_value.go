@@ -46,6 +46,33 @@ func (o *keyValueParser[R, F, S1, S2, T]) Parse(in R) (map[F]T, error) {
 	return result, nil
 }
 
+func (o *keyValueParser[R, F, S1, S2, T]) ParseBytes(in []byte) (map[F]T, []byte, error) {
+	result := make(map[F]T, 7)
+	for {
+		f, out, err := o.key.ParseBytes(in)
+		if err != nil {
+			return result, in, nil
+		}
+
+		_, out, err = o.s1.ParseBytes(out)
+		if err != nil {
+			return result, in, nil
+		}
+
+		s, out, err := o.value.ParseBytes(out)
+		if err != nil {
+			return result, in, nil
+		}
+		result[f] = s
+
+		_, out, err = o.s2.ParseBytes(out)
+		if err != nil {
+			return result, out, nil
+		}
+		in = out
+	}
+}
+
 // KeyValue returns a map of key value pairs.
 //
 //   - The first parser is the key.

@@ -27,6 +27,17 @@ func (o *blankSpaceParser) Parse(in parser.Reader) (byte, error) {
 	return b, nil
 }
 
+func (o *blankSpaceParser) ParseBytes(in []byte) (byte, []byte, error) {
+	if len(in) == 0 {
+		return 0, in, io.EOF
+	}
+
+	if IsBlankSpace(in[0]) {
+		return in[0], in[1:], nil
+	}
+	return 0, in, errors.ErrNotMatched
+}
+
 // BlankSpace returns a single ASCII blank space character: [ \t\r\n]
 func BlankSpace() parser.Parser[parser.Reader, byte] {
 	return blankSpaceParserInstance

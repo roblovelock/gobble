@@ -15,3 +15,11 @@ func NewByteLookupArray(bytes []byte) [256]bool {
 	}
 	return lookup
 }
+
+func NewInverseByteLookupArray(bytes []byte) [256]bool {
+	lookup := NewByteLookupArray(bytes)
+	for i := range lookup {
+		lookup[i] = !lookup[i]
+	}
+	return lookup
+}

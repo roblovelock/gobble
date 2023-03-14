@@ -1,6 +1,8 @@
 package multi
 
-import "github.com/roblovelock/gobble/pkg/parser"
+import (
+	"github.com/roblovelock/gobble/pkg/parser"
+)
 
 type (
 	foldMany0Parser[R parser.Reader, T, A any] struct {
@@ -15,6 +17,20 @@ func (o *foldMany0Parser[R, T, A]) Parse(in R) (A, error) {
 		o.accumulator = o.fn(o.accumulator, r)
 	}
 	return o.accumulator, nil
+}
+
+func (o *foldMany0Parser[R, T, A]) ParseBytes(in []byte) (A, []byte, error) {
+	var r T
+	var err error
+	out := in
+	for {
+		r, out, err = o.parser.ParseBytes(out)
+		if err != nil {
+			break
+		}
+		o.accumulator = o.fn(o.accumulator, r)
+	}
+	return o.accumulator, out, nil
 }
 
 func FoldMany0[R parser.Reader, T, A any](p parser.Parser[R, T], acc A, f parser.Accumulator[T, A]) parser.Parser[R, A] {

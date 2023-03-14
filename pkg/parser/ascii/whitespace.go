@@ -28,6 +28,18 @@ func (*whitespaceParser) Parse(in parser.Reader) (byte, error) {
 	return b, nil
 }
 
+func (o *whitespaceParser) ParseBytes(in []byte) (byte, []byte, error) {
+	if len(in) == 0 {
+		return 0, in, io.EOF
+	}
+
+	if !IsWhitespace(in[0]) {
+		return 0, in, errors.ErrNotMatched
+	}
+
+	return in[0], in[1:], nil
+}
+
 // Whitespace returns a single ASCII whitespace character: [ \t\r\n\v\f]
 func Whitespace() parser.Parser[parser.Reader, byte] {
 	return &whitespaceParserInstance

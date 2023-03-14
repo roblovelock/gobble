@@ -97,3 +97,7 @@ func ParseJSON(json string) (interface{}, error) {
 	reader := strings.NewReader(json)
 	return jsonValue.Parse(reader)
 }
+
+func ParseBytesJSON(json string) (interface{}, []byte, error) {
+	return jsonValue.ParseBytes([]byte(json))
+}

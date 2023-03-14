@@ -3,6 +3,7 @@ package bytes
 import (
 	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/utils"
 	"io"
 	"math"
 )
@@ -43,6 +44,21 @@ func (o *takeWhileMinMaxParser) Parse(in parser.Reader) ([]byte, error) {
 	return result, nil
 }
 
+func (o *takeWhileMinMaxParser) ParseBytes(in []byte) ([]byte, []byte, error) {
+	max := utils.Min(len(in), o.max)
+	n := 0
+	for ; n < max; n++ {
+		if !o.predicate(in[n]) {
+			break
+		}
+	}
+	if n < o.min {
+		return nil, in, errors.ErrNotMatched
+	}
+
+	return in[:n], in[n:], nil
+}
+
 // TakeWhile Returns zero or more bytes that match the predicate.
 //   - If the input matches the predicate, it will return the matched bytes.
 //   - If the input is empty, it will return an empty slice
@@ -54,7 +70,7 @@ func TakeWhile(predicate parser.Predicate[byte]) parser.Parser[parser.Reader, []
 // TakeWhile1 Returns one or more bytes that match the predicate.
 //   - If the input matches the predicate, it will return the matched bytes.
 //   - If the input is empty, it will return io.EOF
-//   - If the input doesn't match the predicate, it will return parser.ErrNotMatched
+//   - If the input doesn't match the predicate, it will return errors.ErrNotMatched
 func TakeWhile1(predicate parser.Predicate[byte]) parser.Parser[parser.Reader, []byte] {
 	return TakeWhileMinMax(1, math.MaxInt, predicate)
 }
@@ -62,7 +78,7 @@ func TakeWhile1(predicate parser.Predicate[byte]) parser.Parser[parser.Reader, [
 // TakeWhileMinMax Returns the longest (m <= len <= n) input slice that matches the predicate.
 //   - If the input matches the predicate and (m <= len <= n), it will return the matched bytes.
 //   - If the input is empty and m > 0, it will return io.EOF
-//   - If the number of matched bytes < m, it will return parser.ErrNotMatched
+//   - If the number of matched bytes < m, it will return errors.ErrNotMatched
 func TakeWhileMinMax(min, max int, predicate parser.Predicate[byte]) parser.Parser[parser.Reader, []byte] {
 	return &takeWhileMinMaxParser{min: min, max: max, predicate: predicate}
 }

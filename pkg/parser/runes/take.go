@@ -1,9 +1,11 @@
 package runes
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 	"strings"
+	"unicode/utf8"
 )
 
 type (
@@ -26,6 +28,23 @@ func (o *takeParser) Parse(in parser.Reader) (string, error) {
 	}
 
 	return builder.String(), nil
+}
+
+func (o *takeParser) ParseBytes(in []byte) (string, []byte, error) {
+	size := 0
+	for i := 0; i < o.n; i++ {
+		if len(in) < size {
+			return "", in, io.EOF
+		}
+		if c := in[size]; c < utf8.RuneSelf {
+			size++
+			continue
+		}
+		_, s := utf8.DecodeRune(in)
+		size += s
+	}
+
+	return string(in[:size]), in[size:], errors.ErrNotMatched
 }
 
 // Take returns a string containing n runes from the input

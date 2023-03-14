@@ -24,6 +24,19 @@ func (o *altParser[R, T]) Parse(in R) (T, error) {
 	return r, errors.ErrNotMatched
 }
 
+func (o *altParser[R, T]) ParseBytes(in []byte) (T, []byte, error) {
+	for _, p := range o.parsers {
+		if r, out, err := p.ParseBytes(in); err == nil {
+			return r, out, nil
+		} else if errors.IsFatal(err) {
+			var t T
+			return t, in, err
+		}
+	}
+	var r T
+	return r, in, errors.ErrNotMatched
+}
+
 // Alt Trys a list of parsers and returns the result of the first successful one.
 func Alt[R parser.Reader, T any](parsers ...parser.Parser[R, T]) parser.Parser[R, T] {
 	return &altParser[R, T]{parsers: parsers}

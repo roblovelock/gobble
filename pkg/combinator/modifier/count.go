@@ -19,6 +19,14 @@ func (o *countParser[R, V, T]) Parse(in R) (int, error) {
 	return len(v), nil
 }
 
+func (o *countParser[R, V, T]) ParseBytes(in []byte) (int, []byte, error) {
+	v, out, err := o.parser.ParseBytes(in)
+	if err != nil {
+		return 0, in, err
+	}
+	return len(v), out, nil
+}
+
 // Count will return the length of the value returned from the parser
 func Count[R parser.Reader, V any, T countParserConstraint[V]](p parser.Parser[R, T]) parser.Parser[R, int] {
 	return &countParser[R, V, T]{parser: p}

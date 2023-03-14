@@ -37,6 +37,32 @@ func (o *takeWhileMinMaxParser[R, T]) Parse(in R) ([]T, error) {
 	return result, nil
 }
 
+func (o *takeWhileMinMaxParser[R, T]) ParseBytes(in []byte) ([]T, []byte, error) {
+	var r T
+	var err error
+	out := in
+	result := make([]T, 0, o.min)
+	for i := 0; i < o.max; i++ {
+		r, out, err = o.parser.ParseBytes(out)
+		if err != nil {
+			if len(result) < o.min {
+				return nil, in, err
+			}
+			return result, in, nil
+		}
+
+		if !o.predicate(r) {
+			if len(result) < o.min {
+				return nil, in, errors.ErrNotMatched
+			}
+			return result, in, nil
+		}
+		result = append(result, r)
+	}
+
+	return result, out, nil
+}
+
 func TakeWhileMinMax[R parser.Reader, T any](p parser.Parser[R, T], min, max int, predicate parser.Predicate[T]) parser.Parser[R, []T] {
 	return &takeWhileMinMaxParser[R, T]{parser: p, min: min, max: max, predicate: predicate}
 }

@@ -24,6 +24,23 @@ func (o *separated0Parser[R, T, S]) Parse(in R) ([]T, error) {
 	return result, nil
 }
 
+func (o *separated0Parser[R, T, S]) ParseBytes(in []byte) ([]T, []byte, error) {
+	result := make([]T, 0)
+	for {
+		r, out, err := o.parser.ParseBytes(in)
+		if err != nil {
+			return result, in, nil
+		}
+		result = append(result, r)
+
+		_, out, err = o.separator.ParseBytes(out)
+		if err != nil {
+			return result, out, nil
+		}
+		in = out
+	}
+}
+
 func Separated0[R parser.Reader, T any, S any](
 	p parser.Parser[R, T], separator parser.Parser[R, S],
 ) parser.Parser[R, []T] {

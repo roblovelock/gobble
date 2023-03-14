@@ -37,6 +37,10 @@ func (o *tagParser[T]) Parse(in parser.BitReader) (T, error) {
 
 }
 
+func (*tagParser[T]) ParseBytes(in []byte) (T, []byte, error) {
+	return 0, in, errors.ErrNotSupported
+}
+
 func Tag[T tagParserConstraint](n uint8, tag T) parser.Parser[parser.BitReader, T] {
 	var t T
 	l := bits.Len64(uint64(t) - 1)

@@ -13,6 +13,11 @@ func (o *failParser[R, T]) Parse(_ R) (T, error) {
 	return t, o.err
 }
 
+func (o *failParser[R, T]) ParseBytes(in []byte) (T, []byte, error) {
+	var t T
+	return t, in, o.err
+}
+
 // Fail always fails. It returns the provided err without consuming any input.
 func Fail[R parser.Reader, T any](err error) parser.Parser[R, T] {
 	return &failParser[R, T]{err: err}

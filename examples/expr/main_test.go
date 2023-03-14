@@ -50,35 +50,48 @@ func TestParseExpr(t *testing.T) {
 	}
 }
 
-func BenchmarkExpr1Op(b *testing.B) {
-	text := "19 + 10"
-	for i := 0; i < b.N; i++ {
-		_, _ = ParseExpr(text)
+func TestParseBytesExpr(t *testing.T) {
+	type args struct {
+		expr string
 	}
-	b.SetBytes(int64(len(text)))
-}
-
-func BenchmarkExpr2Op(b *testing.B) {
-	text := "19+10*20"
-	for i := 0; i < b.N; i++ {
-		_, _ = ParseExpr(text)
+	tests := []struct {
+		name    string
+		args    args
+		want    int64
+		wantErr error
+	}{
+		{
+			name: "test add",
+			args: args{expr: "1 + 2"},
+			want: 3,
+		},
+		{
+			name: "test subtract expression",
+			args: args{expr: " ( 1 - 2 ) "},
+			want: -1,
+		},
+		{
+			name: "test multiply",
+			args: args{expr: "2  *  3"},
+			want: 6,
+		},
+		{
+			name: "test add and multiply",
+			args: args{expr: "19 + 10 * 20"},
+			want: 219,
+		},
+		{
+			name: "test add expression then multiply",
+			args: args{expr: "(19 + 10) * 20"},
+			want: 580,
+		},
 	}
-	b.SetBytes(int64(len(text)))
-}
-
-func BenchmarkExpr3Op(b *testing.B) {
-	text := "19 + 10 * 20/9"
-	for i := 0; i < b.N; i++ {
-		_, _ = ParseExpr(text)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, out, err := ParseBytesExpr(tt.args.expr)
+			assert.ErrorIs(t, err, tt.wantErr)
+			assert.Empty(t, out)
+			assert.Equal(t, tt.want, got)
+		})
 	}
-	b.SetBytes(int64(len(text)))
-}
-
-func BenchmarkExpr(b *testing.B) {
-	text := `4 + 123 + 23 + 67 +89 + 87 *78
-/67-98-		 199`
-	for i := 0; i < b.N; i++ {
-		_, _ = ParseExpr(text)
-	}
-	b.SetBytes(int64(len(text)))
 }

@@ -40,10 +40,33 @@ func (o *lineEndingParser) Parse(in parser.Reader) ([]byte, error) {
 	return []byte{'\r', '\n'}, nil
 }
 
+func (o *lineEndingParser) ParseBytes(in []byte) ([]byte, []byte, error) {
+	if len(in) == 0 {
+		return nil, in, io.EOF
+	}
+
+	if in[0] == '\n' {
+		return in[:1], in[1:], nil
+	}
+
+	if in[0] == '\r' {
+		if len(in) == 1 {
+			return nil, in, io.EOF
+		}
+
+		if in[1] == '\n' {
+			return in[:2], in[2:], nil
+		}
+	}
+
+	return nil, in, errors.ErrNotMatched
+
+}
+
 // CRLF matches the sequence `\r\n`
 //   - If the input matches `\r\n`, it will return the match.
 //   - If the input is empty, it will return io.EOF
-//   - If the input doesn't match, it will return parser.ErrNotMatched
+//   - If the input doesn't match, it will return errors.ErrNotMatched
 func CRLF() parser.Parser[parser.Reader, []byte] {
 	return bytes.Tag([]byte{'\r', '\n'})
 }
@@ -51,7 +74,7 @@ func CRLF() parser.Parser[parser.Reader, []byte] {
 // Newline matches a new line: `\n`
 //   - If the input matches, it will return the match.
 //   - If the input is empty, it will return io.EOF
-//   - If the input doesn't match, it will return parser.ErrNotMatched.
+//   - If the input doesn't match, it will return errors.ErrNotMatched.
 func Newline() parser.Parser[parser.Reader, byte] {
 	return bytes.Byte('\n')
 }
@@ -59,7 +82,7 @@ func Newline() parser.Parser[parser.Reader, byte] {
 // LineEnding matches the end of a line: `\n` and `\r\n`
 //   - If the input matches, it will return the match.
 //   - If the input is empty, it will return io.EOF
-//   - If the input doesn't match, it will return parser.ErrNotMatched.
+//   - If the input doesn't match, it will return errors.ErrNotMatched.
 func LineEnding() parser.Parser[parser.Reader, []byte] {
 	return lineEndingParserInstance
 }

@@ -34,6 +34,20 @@ func (o *pairParser[R, F, S]) Parse(in R) (parser.Pair[F, S], error) {
 	return parser.Pair[F, S]{First: f, Second: s}, err
 }
 
+func (o *pairParser[R, F, S]) ParseBytes(in []byte) (parser.Pair[F, S], []byte, error) {
+	f, out, err := o.first.ParseBytes(in)
+	if err != nil {
+		var r parser.Pair[F, S]
+		return r, in, err
+	}
+	s, out, err := o.second.ParseBytes(out)
+	if err != nil {
+		var r parser.Pair[F, S]
+		return r, in, err
+	}
+	return parser.Pair[F, S]{First: f, Second: s}, out, err
+}
+
 func (o *separatedPairParser[R, F, S, T]) Parse(in R) (parser.Pair[F, S], error) {
 	currentOffset, _ := in.Seek(0, io.SeekCurrent)
 	f, err := o.first.Parse(in)
@@ -55,6 +69,27 @@ func (o *separatedPairParser[R, F, S, T]) Parse(in R) (parser.Pair[F, S], error)
 		return r, err
 	}
 	return parser.Pair[F, S]{First: f, Second: s}, err
+}
+
+func (o *separatedPairParser[R, F, S, T]) ParseBytes(in []byte) (parser.Pair[F, S], []byte, error) {
+	f, out, err := o.first.ParseBytes(in)
+	if err != nil {
+		var r parser.Pair[F, S]
+		return r, in, err
+	}
+
+	_, out, err = o.separator.ParseBytes(out)
+	if err != nil {
+		var r parser.Pair[F, S]
+		return r, in, err
+	}
+
+	s, out, err := o.second.ParseBytes(out)
+	if err != nil {
+		var r parser.Pair[F, S]
+		return r, in, err
+	}
+	return parser.Pair[F, S]{First: f, Second: s}, out, err
 }
 
 // Pair Gets an object from the first parser, then gets another object from the second parser.

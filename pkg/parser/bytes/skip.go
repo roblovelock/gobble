@@ -3,6 +3,7 @@ package bytes
 import (
 	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
+	"github.com/roblovelock/gobble/pkg/utils"
 	"io"
 	"math"
 )
@@ -44,6 +45,26 @@ func (o *skipWhileMinMaxParser) Parse(in parser.Reader) (parser.Empty, error) {
 	return nil, nil
 }
 
+func (o *skipWhileMinMaxParser) ParseBytes(in []byte) (parser.Empty, []byte, error) {
+	if len(in) < o.min {
+		return nil, in, io.EOF
+	}
+
+	max := utils.Min(o.max, len(in))
+	n := 0
+	for ; n < max; n++ {
+		if !o.predicate(in[n]) {
+			break
+		}
+	}
+
+	if n < o.min {
+		return nil, in, errors.ErrNotMatched
+	}
+
+	return nil, in[n:], nil
+}
+
 func (o *skipParser) Parse(in parser.Reader) (parser.Empty, error) {
 	b, err := in.ReadByte()
 	if err != nil {
@@ -56,6 +77,18 @@ func (o *skipParser) Parse(in parser.Reader) (parser.Empty, error) {
 	}
 
 	return nil, nil
+}
+
+func (o *skipParser) ParseBytes(in []byte) (parser.Empty, []byte, error) {
+	if len(in) == 0 {
+		return nil, in, io.EOF
+	}
+
+	if !o.predicate(in[0]) {
+		return nil, in, errors.ErrNotMatched
+	}
+
+	return nil, in[1:], nil
 }
 
 // Skip will skip over a byte if it matches the predicate.

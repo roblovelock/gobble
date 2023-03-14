@@ -21,6 +21,13 @@ func (o *eofParser) Parse(in parser.Reader) (parser.Empty, error) {
 	return nil, errors.ErrNotMatched
 }
 
+func (o *eofParser) ParseBytes(in []byte) (parser.Empty, []byte, error) {
+	if len(in) == 0 {
+		return nil, in, nil
+	}
+	return nil, in, errors.ErrNotMatched
+}
+
 // EOF Returns successfully if it is at the end of input data
 func EOF() parser.Parser[parser.Reader, parser.Empty] {
 	return eofParserInstance

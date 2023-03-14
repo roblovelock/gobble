@@ -32,6 +32,13 @@ func benchmarkJSON(b *testing.B, json string) {
 	}
 	b.SetBytes(int64(len(json)))
 }
+func benchmarkBytesJSON(b *testing.B, json string) {
+	for i := 0; i < b.N; i++ {
+		val, _, _ := ParseBytesJSON(json)
+		sink(val)
+	}
+	b.SetBytes(int64(len(json)))
+}
 
 func BenchmarkJSONInt(b *testing.B) {
 	benchmarkJSON(b, intText)
@@ -70,10 +77,26 @@ func BenchmarkJSONMedium(b *testing.B) {
 	benchmarkJSON(b, string(text))
 }
 
+func BenchmarkBytesJSONMedium(b *testing.B) {
+	text, err := os.ReadFile("testdata/medium.json")
+	if err != nil {
+		b.Error(err)
+	}
+	benchmarkBytesJSON(b, string(text))
+}
+
 func BenchmarkJSONLarge(b *testing.B) {
 	text, err := os.ReadFile("testdata/large.json")
 	if err != nil {
 		b.Error(err)
 	}
 	benchmarkJSON(b, string(text))
+}
+
+func BenchmarkBytesJSONLarge(b *testing.B) {
+	text, err := os.ReadFile("testdata/large.json")
+	if err != nil {
+		b.Error(err)
+	}
+	benchmarkBytesJSON(b, string(text))
 }

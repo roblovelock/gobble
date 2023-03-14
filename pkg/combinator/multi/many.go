@@ -35,6 +35,18 @@ func (o *many0Parser[R, T]) Parse(in R) ([]T, error) {
 	return result, nil
 }
 
+func (o *many0Parser[R, T]) ParseBytes(in []byte) (result []T, out []byte, err error) {
+	var r T
+	out = in
+	for {
+		r, out, err = o.parser.ParseBytes(out)
+		if err != nil {
+			return result, out, nil
+		}
+		result = append(result, r)
+	}
+}
+
 func (o *many0CountParser[R, T]) Parse(in R) (uint, error) {
 	var count uint = 0
 	for {
@@ -45,6 +57,17 @@ func (o *many0CountParser[R, T]) Parse(in R) (uint, error) {
 	}
 
 	return count, nil
+}
+
+func (o *many0CountParser[R, T]) ParseBytes(in []byte) (count uint, out []byte, err error) {
+	out = in
+	for {
+		_, out, err = o.parser.ParseBytes(out)
+		if err != nil {
+			return count, out, nil
+		}
+		count++
+	}
 }
 
 func (o *many1Parser[R, T]) Parse(in R) ([]T, error) {
@@ -61,6 +84,21 @@ func (o *many1Parser[R, T]) Parse(in R) ([]T, error) {
 	return result, nil
 }
 
+func (o *many1Parser[R, T]) ParseBytes(in []byte) (result []T, out []byte, err error) {
+	var r T
+	out = in
+	for {
+		r, out, err = o.parser.ParseBytes(out)
+		if err != nil {
+			if len(result) == 0 {
+				return result, in, err
+			}
+			return result, out, nil
+		}
+		result = append(result, r)
+	}
+}
+
 func (o *many1CountParser[R, T]) Parse(in R) (uint, error) {
 	if _, err := o.parser.Parse(in); err != nil {
 		return 0, err
@@ -72,6 +110,20 @@ func (o *many1CountParser[R, T]) Parse(in R) (uint, error) {
 	}
 
 	return count, nil
+}
+
+func (o *many1CountParser[R, T]) ParseBytes(in []byte) (count uint, out []byte, err error) {
+	out = in
+	for {
+		_, out, err = o.parser.ParseBytes(out)
+		if err != nil {
+			if count == 0 {
+				return count, in, err
+			}
+			return count, out, nil
+		}
+		count++
+	}
 }
 
 func Many0[R parser.Reader, T any](p parser.Parser[R, T]) parser.Parser[R, []T] {

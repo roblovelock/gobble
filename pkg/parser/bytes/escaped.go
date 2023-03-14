@@ -1,6 +1,7 @@
 package bytes
 
 import (
+	"github.com/roblovelock/gobble/pkg/errors"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -38,6 +39,35 @@ func (o *escapedParser) Parse(in parser.Reader) (string, error) {
 	result := make([]byte, endOffset-startOffset)
 	_, _ = in.Read(result)
 	return string(result), nil
+}
+
+func (o *escapedParser) ParseBytes(in []byte) (string, []byte, error) {
+	n := 0
+	for ; n < len(in); n++ {
+		if o.normal(in[n]) {
+			continue
+		}
+		if o.control != in[n] {
+			break
+		}
+
+		if len(in) < n+1 {
+			n--
+			break
+		}
+		if !o.escapable(in[n+1]) {
+			n--
+			break
+		}
+		n++
+	}
+	if n == 0 {
+		if len(in) == 0 {
+			return "", in, io.EOF
+		}
+		return "", in, errors.ErrNotMatched
+	}
+	return string(in[:n]), in[n:], nil
 }
 
 // Escaped matches a byte stream with escape characters

@@ -24,6 +24,14 @@ func (o *takeParser) Parse(in parser.Reader) ([]byte, error) {
 	return b, nil
 }
 
+func (o *takeParser) ParseBytes(in []byte) ([]byte, []byte, error) {
+	if len(in) < int(o.n) {
+		return nil, in, io.EOF
+	}
+
+	return in[:o.n], in[o.n:], nil
+}
+
 // Take returns a slice of n bytes from the input
 //   - If the input contains n bytes, it will return a slice of n bytes.
 //   - If the input doesn't contain n bytes, it will return io.EOF

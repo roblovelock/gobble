@@ -25,6 +25,14 @@ func (o *recognizeParser[R, T]) Parse(in R) ([]byte, error) {
 	return result, nil
 }
 
+func (o *recognizeParser[R, T]) ParseBytes(in []byte) ([]byte, []byte, error) {
+	_, out, err := o.parser.ParseBytes(in)
+	if err != nil {
+		return nil, in, err
+	}
+	return in[:len(in)-len(out)], out, nil
+}
+
 // Recognize If the child parser was successful, return the consumed input as produced value.
 func Recognize[R parser.Reader, T any](p parser.Parser[R, T]) parser.Parser[R, []byte] {
 	return &recognizeParser[R, T]{parser: p}

@@ -3,6 +3,8 @@ package runes
 
 import (
 	"github.com/roblovelock/gobble/pkg/parser"
+	"io"
+	"unicode/utf8"
 )
 
 type (
@@ -14,6 +16,19 @@ var oneParserInstance = &oneParser{}
 func (o *oneParser) Parse(in parser.Reader) (rune, error) {
 	r, _, err := in.ReadRune()
 	return r, err
+}
+
+func (o *oneParser) ParseBytes(in []byte) (rune, []byte, error) {
+	if len(in) == 0 {
+		return 0, in, io.EOF
+	}
+
+	if c := in[0]; c < utf8.RuneSelf {
+		return rune(c), in[1:], nil
+	}
+
+	ch, size := utf8.DecodeRune(in)
+	return ch, in[size:], nil
 }
 
 // One reads a single rune

@@ -18,6 +18,11 @@ func (o *peekParser[R, T]) Parse(in R) (T, error) {
 	return t, err
 }
 
+func (o *peekParser[R, T]) ParseBytes(in []byte) (T, []byte, error) {
+	t, _, err := o.parser.ParseBytes(in)
+	return t, in, err
+}
+
 // Peek returns the result of the parser without consuming the input.
 func Peek[R parser.Reader, T any](p parser.Parser[R, T]) parser.Parser[R, T] {
 	return &peekParser[R, T]{parser: p}

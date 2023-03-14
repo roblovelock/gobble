@@ -25,6 +25,19 @@ func (o *precededParser[R, F, S]) Parse(in R) (S, error) {
 	return s, err
 }
 
+func (o *precededParser[R, F, S]) ParseBytes(in []byte) (S, []byte, error) {
+	_, out, err := o.first.ParseBytes(in)
+	if err != nil {
+		var r S
+		return r, in, err
+	}
+	s, out, err := o.second.ParseBytes(out)
+	if err != nil {
+		return s, in, err
+	}
+	return s, out, err
+}
+
 // Preceded Matches an object from the first parser and discards it, then gets an object from the second parser.
 func Preceded[R parser.Reader, F, S any](first parser.Parser[R, F], second parser.Parser[R, S]) parser.Parser[R, S] {
 	return &precededParser[R, F, S]{first: first, second: second}

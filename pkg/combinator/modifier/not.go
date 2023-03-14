@@ -22,6 +22,14 @@ func (o *notParser[R, T]) Parse(in R) (parser.Empty, error) {
 	return nil, errors.ErrNotMatched
 }
 
+func (o *notParser[R, T]) ParseBytes(in []byte) (parser.Empty, []byte, error) {
+	_, _, err := o.parser.ParseBytes(in)
+	if err != nil {
+		return nil, in, nil
+	}
+	return nil, in, errors.ErrNotMatched
+}
+
 // Not returns a result only if the parser returns an error. It doesn't consume any input
 func Not[R parser.Reader, T any](p parser.Parser[R, T]) parser.Parser[R, parser.Empty] {
 	return &notParser[R, T]{parser: p}

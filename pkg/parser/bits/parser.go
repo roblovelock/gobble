@@ -1,6 +1,7 @@
 package bits
 
 import (
+	"bytes"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
 )
@@ -26,6 +27,16 @@ func (o *bitsParser[T]) Parse(in parser.Reader) (T, error) {
 	}
 
 	return result, nil
+}
+
+func (o *bitsParser[T]) ParseBytes(in []byte) (T, []byte, error) {
+	inReader := bytes.NewReader(in)
+	t, err := o.Parse(&bitReader{Reader: inReader})
+	if err != nil {
+		return t, in, err
+	}
+	currentOffset, _ := inReader.Seek(0, io.SeekCurrent)
+	return t, in[currentOffset:], err
 }
 
 func Bits[T any](p parser.Parser[parser.BitReader, T]) parser.Parser[parser.Reader, T] {

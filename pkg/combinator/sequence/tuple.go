@@ -27,6 +27,20 @@ func (o *tupleParser[R, T]) Parse(in R) ([]T, error) {
 	return result, nil
 }
 
+func (o *tupleParser[R, T]) ParseBytes(in []byte) (result []T, out []byte, err error) {
+	var r T
+	out = in
+	for i, p := range o.parsers {
+		r, out, err = p.ParseBytes(in)
+		if err != nil {
+			return nil, in, err
+		}
+		result[i] = r
+	}
+
+	return result, out, nil
+}
+
 // Tuple applies a number of parsers one by one and returns their results as a slice.
 func Tuple[R parser.Reader, T any](parsers ...parser.Parser[R, T]) parser.Parser[R, []T] {
 	return &tupleParser[R, T]{parsers: parsers}

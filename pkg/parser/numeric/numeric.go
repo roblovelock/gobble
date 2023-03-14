@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"github.com/roblovelock/gobble/pkg/parser"
 	"io"
+	"math"
 )
 
 type (
@@ -25,6 +26,59 @@ func (o *endianParser[T]) Parse(in parser.Reader) (result T, err error) {
 		err = io.EOF
 	}
 	return result, err
+}
+
+func (o *endianParser[T]) ParseBytes(in []byte) (result T, out []byte, err error) {
+	out, err = readNumeric(in, o.byteOrder, &result)
+	return
+}
+
+func readNumeric(in []byte, order binary.ByteOrder, data any) ([]byte, error) {
+	size := intDataSize(data)
+	if len(in) < size {
+		return in, io.EOF
+	}
+
+	switch data := data.(type) {
+	case *bool:
+		*data = in[0] != 0
+	case *int8:
+		*data = int8(in[0])
+	case *uint8:
+		*data = in[0]
+	case *int16:
+		*data = int16(order.Uint16(in[:size]))
+	case *uint16:
+		*data = order.Uint16(in[:size])
+	case *int32:
+		*data = int32(order.Uint32(in[:size]))
+	case *uint32:
+		*data = order.Uint32(in[:size])
+	case *int64:
+		*data = int64(order.Uint64(in[:size]))
+	case *uint64:
+		*data = order.Uint64(in[:size])
+	case *float32:
+		*data = math.Float32frombits(order.Uint32(in[:size]))
+	case *float64:
+		*data = math.Float64frombits(order.Uint64(in[:size]))
+	}
+
+	return in[size:], nil
+}
+
+func intDataSize(data any) int {
+	switch data.(type) {
+	case *bool, *int8, *uint8:
+		return 1
+	case *int16, *uint16:
+		return 2
+	case *int32, *uint32, *float32:
+		return 4
+	case *int64, *uint64, *float64:
+		return 8
+	}
+	return 0
 }
 
 // UInt8 returns a 1 byte unsigned integer. io.EOF is returned if the input contains too few bytes

@@ -9,6 +9,8 @@ const (
 	ErrNotMatched = Error("not matched") // parser didn't match input
 )
 
+var ErrNotSupported = NewFatalError(Error("not supported"))
+
 type (
 	ParserError interface {
 		error
